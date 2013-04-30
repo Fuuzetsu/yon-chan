@@ -1,4 +1,4 @@
-;;; 4chan.el --- A 4chan browser for Emacs
+;;; yon-chan.el --- A 4chan browser for Emacs
 
 ;; Copyright (C) 2013  David Thompson
 
@@ -26,16 +26,149 @@
 ;;; Code:
 
 (require 'json)
+(require 'cl)
 
 (define-derived-mode yon-chan-mode
   special-mode "4chan"
   "4chan browser.")
+
 
 ;; (defun yon-mode-keys ()
 ;;   "Set local key defs for yon-mode"
 ;;   (define-key yon-mode-map "q" 'quit-window)
 
 (defvar yon-api-url "http://api.4chan.org/")
+
+(global-set-key (kbd "C-c C-r gd") 'yon-apply-deadlinks)
+(global-set-key (kbd "C-c C-r gl") 'yon-apply-greenstuff)
+
+(defface yon-chan-greentext
+  '((default)
+    (((class color) (min-colors 16) (background light)) :foreground "ForestGreen")
+    (((class color) (min-colors 88) (background dark))  :foreground "green3")
+    (((class color) (min-colors 16) (background dark))  :foreground "green3")
+    (((class color)) :foreground "green3"))
+  "Basic greentext face for all the implications we can imply.")
+
+(defface yon-chan-poster
+  '((default :weight bold)
+    (((class color) (min-colors 16) (background light)) :foreground "purple4")
+    (((class color) (min-colors 16) (background dark))  :foreground "purple2")
+    (((class color)) :foreground "purple"))
+  "Basic face for the poster name.")
+
+(defface yon-chan-topic-name
+  '((default :weight bold)
+    (((class color)) :foreground "brown"))
+  "Basic face for the topic name.")
+
+(defface yon-chan-post-number
+  '((default :weight bold)
+    (((class color)) :foreground "red3"))
+  "Basic face for the poster number.")
+
+(defface yon-chan-deadlink
+  '((default :strike-through t)
+    (((class color)) :foreground "red2"))
+  "Basic face for dead cross-links.")
+
+
+(defun yon-clean-html-string (body)
+  (let* ((replace-list (list '("&#039;" . "'")
+                             '("&gt;" . ">")
+                             '("&lt;" . "<")
+                             '("&quot;" . "\"")
+                             '("&amp;" . "&")
+                             '("<br>" . "\n")
+                             '("<wbr>" . "")))
+         (replacer (lambda (x y)
+                     (replace-regexp-in-string
+                      (car y) (cdr y) x))))
+    (reduce replacer (cons body replace-list))))
+
+
+(defun yon-get-line-content ()
+  (save-excursion
+   (let ((pos-end (line-beginning-position 2)))
+     (buffer-substring (line-beginning-position) pos-end))))
+
+(defun yon-get-closing-point (bufstr close)
+  (let ((match (string-match close bufstr)))
+    (when match
+      (+ match (length close)))))
+
+(defun yon-get-section (start end)
+  (save-excursion
+    (buffer-substring start end)))
+
+
+;; Interactive for now for testing
+(defun yon-possibly-colorify-line-by-tags
+  (opregex endregex colourface &optional newline)
+  "Least elegant function that will replace quotes with greentext."
+  (interactive)
+  (let ((start (string-match opregex (yon-get-line-content)))
+        (op opregex)
+        (ed endregex))
+    (when start
+      (let* ((startn (+ start (line-beginning-position)))
+             (end (+ (yon-get-closing-point
+                      (yon-get-section startn (point-max)) ed)
+                     startn)))
+        (save-excursion
+          (goto-char startn)
+          (delete-char (length op))
+          (goto-char (- end (length op)))
+          (delete-backward-char (length ed))
+          (goto-char startn)
+          (let ((cont (yon-get-section startn (- end
+                                                 (+ (length op)
+                                                    (length ed))))))
+            (progn
+              (delete-char (length cont))
+              (if newline
+                  (insert (propertize (yon-strip-newlines cont)
+                                      'face colourface))
+                (insert (propertize cont
+                                    'face colourface))))))))))
+
+
+;; interactive for testing
+(defun yon-apply-deadlinks ()
+  "Checks each line for deadlink replacement."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
+                              "<span class=\"deadlink\">" "</span>"
+                              'yon-chan-deadlink t)
+             (forward-line 1))))
+
+;; interactive for testing
+(defun yon-apply-greenstuff ()
+  "Checks each line for greentext replacement."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
+                              "<span class=\"quote\">" "</span>"
+                              'yon-chan-greentext t)
+             (forward-line 1))))
+
+;; Interactive for now for testing
+(defun yon-possibly-greenify-line ()
+  "Least elegant function that will replace quotes with greentext."
+  (interactive)
+  (let ((op "<span class=\"quote\">")
+        (ed "</span>")))
+  )
+
+(defun yon-strip-newlines (body)
+  (replace-regexp-in-string "\n" "" body))
+
+(defun yon-process-post (body)
+  (let* ((cleaned (yon-clean-html-string body)))
+    cleaned))
 
 (defun yon-elem (alst key &optional default)
   (lexical-let ((elem (cdr (assoc key alst))))
@@ -62,10 +195,12 @@
   (with-current-buffer buffer
     (setq buffer-read-only nil)
     (funcall proc json)
+    (yon-apply-greenstuff)
+    (yon-apply-deadlinks)
     (setq buffer-read-only t)))
 
 (defun yon-render-board (catalog)
-    (mapc 'yon-render-page catalog))
+  (mapc 'yon-render-page catalog))
 
 (defun yon-render-page (page)
   (mapc 'yon-render-op-post (yon-elem page 'threads)))
@@ -81,36 +216,44 @@
 ;; Possible Output:
 ;;   Subject - No Subject
 (defun yon-render-post (post)
-  (insert (yon-elem post 'sub "No subject"))
-  (insert " - ")
-  (insert (yon-elem post 'name "No name"))
-  (insert " - ")
-  (insert (yon-elem post 'now))
-  (insert " - No. ")
+  (yon-insert-header post)
   (insert (number-to-string (yon-elem post 'no)))
   (newline)
-  (insert (yon-elem post 'com ""))
+  (insert (yon-process-post (yon-elem post 'com "")))
   (newline)
   (newline))
 
 (defun yon-render-op-post (post)
-  (insert (yon-elem post 'sub "No subject"))
-  (insert " - ")
-  (insert (yon-elem post 'name "No name"))
-  (insert " - ")
-  (insert (yon-elem post 'now))
-  (insert " - No. ")
-  (insert (number-to-string (yon-elem post 'no)))
-  (newline)
+  (yon-insert-header post)
   (auto-fill-mode t)
-  (insert (yon-elem post 'com ""))
+  (insert (yon-process-post (yon-elem post 'com "")))
   (auto-fill-mode nil)
   (newline)
   (newline))
 
+
+(defun yon-insert-header (post)
+  (insert
+   (propertize
+    (yon-clean-html-string (yon-elem post 'sub "No subject"))
+    'face 'yon-chan-topic-name))
+  (insert " - ")
+  (insert
+   (propertize
+    (yon-clean-html-string (yon-elem post 'name "No name"))
+    'face 'yon-chan-poster))
+  (insert " - ")
+  (insert (yon-clean-html-string (yon-elem post 'now)))
+  (insert " - ")
+  (insert
+   (propertize
+    (concat "No. "(number-to-string (yon-elem post 'no)))
+    'face 'yon-chan-post-number))
+  (newline))
+
 ;; let's hard code this for now
 (defun yon-browse-g (buffer)
-  (url-retrieve "http://api.4chan.org/g/catalog.json"
+  (url-retrieve "http://api.4chan.org/q/catalog.json"
                 (lexical-let ((yon-buffer buffer))
                   (lambda (status)
                     (yon-render yon-buffer
@@ -121,9 +264,11 @@
 (defun yon-chan ()
   "Load 4chan."
   (interactive)
-  (with-current-buffer (switch-to-buffer-other-window (generate-new-buffer "*4chan*"))
+  (with-current-buffer (switch-to-buffer-other-window
+                        (generate-new-buffer "*4chan*"))
     (yon-chan-mode)
     (yon-browse-g (current-buffer))))
 
+
 (provide 'yon-chan)
-;;; 4chan.el ends here
+;;; yon-chan.el ends here
