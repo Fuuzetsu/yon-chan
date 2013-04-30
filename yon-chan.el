@@ -58,16 +58,55 @@
                       (car y) (cdr y) x))))
     (reduce replacer (cons body replace-list))))
 
-;; (defun yon-apply-greentext (body)
-;;   replace-regexp-in-string "<span class=\"quote\">\\(.+?\\)</span>"
-;;   "")
+(defun yon-apply-greentext ()
+  "Applies a greentext face to the whole page content."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (message "applying greentext to %s" (buffer-name))
+    (message "that buffer has %s chars in it" (buffer-size))
+    (while (re-search-forward "<span class=\"quote\">\\(.+?\\)</span>" nil t)
+      (replace-match "\\1"))))
+
+(defun yon-apply-greenstuff ()
+  "Checks each line for greentext replacement."
+  (save-excursion
+    (goto-char (point-min))
+    (cl-loop until (eobp) do (possibly-greenify-line) (forward-line 1))))
+
+(defun get-line-content ()
+  (let ((pos-end (line-beginning-position 2)))
+    (buffer-substring (line-beginning-position) pos-end)))
+
+(defun get-closing-point (bufstr close)
+  (let (( match (string-match close bufstr)))
+    (when match
+      (+ match (length close)))))
+
+(defun yon-possibly-greenify-line ()
+  "Least elegant function that will replace quotes with greentext."
+  (let ((start (+ (string-match "^<span class=\"quote\">" (get-line-content))
+                  (line-beginning-position)))
+        (op "<span class=\"quote\">")
+        (ed "</span>"))
+    (when start
+      (let ((end (get-closing-point (buffer-substring start (point-max)) ed)))
+        (save-excursion
+          (goto-char start)
+          (delete-char (length op))
+          (goto-char end)
+          (delete-backward-char (length ed))
+          (goto-char start)
+          (let ((cont (buffer-substring start (- end
+                                                 (+ (length op)
+                                                    (length ed))))))
+            (progn
+              (delete-char (length cont))
+              (insert (propertize cont 'face 'yon-chan-greentext)))))))))
 
 (defun yon-process-post (body)
-  (let* ((cleaned (yon-clean-post-body body))
-        ;; (greened (yon-apply-greentext cleaned))
-         )
+  (let* ((cleaned (yon-clean-post-body body)))
     cleaned))
-
 
 (defun yon-elem (alst key &optional default)
   (lexical-let ((elem (cdr (assoc key alst))))
@@ -94,10 +133,11 @@
   (with-current-buffer buffer
     (setq buffer-read-only nil)
     (funcall proc json)
+    (yon-apply-greenstuff)
     (setq buffer-read-only t)))
 
 (defun yon-render-board (catalog)
-    (mapc 'yon-render-page catalog))
+  (mapc 'yon-render-page catalog))
 
 (defun yon-render-page (page)
   (mapc 'yon-render-op-post (yon-elem page 'threads)))
