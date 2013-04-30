@@ -108,7 +108,10 @@
                                                     (length ed))))))
             (progn
               (delete-char (length cont))
-              (insert (propertize cont 'face 'yon-chan-greentext)))))))))
+              (insert (propertize (yon-strip-newlines cont) 'face 'yon-chan-greentext)))))))))
+
+(defun yon-strip-newlines (body)
+  (replace-regexp-in-string "\n" "" body))
 
 (defun yon-process-post (body)
   (let* ((cleaned (yon-clean-post-body body)))
