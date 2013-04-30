@@ -91,11 +91,11 @@ Feature: Greentext
     <span class="quote">>test test test</span>
     """
     When I go to beginning of buffer
-    And I press "C-c C-r gr"
+    And I press "C-c C-r gl"
     Then I should see exactly:
     """
     >please go OP
-    <span class="quote">>staying</span>
+    >staying
     Long lines are long.
-    <span class="quote">>test test test</span>
+    >test test test
     """

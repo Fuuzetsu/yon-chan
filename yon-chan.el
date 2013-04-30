@@ -33,7 +33,6 @@
   "4chan browser.")
 
 
-
 ;; (defun yon-mode-keys ()
 ;;   "Set local key defs for yon-mode"
 ;;   (define-key yon-mode-map "q" 'quit-window)
@@ -41,6 +40,7 @@
 (defvar yon-api-url "http://api.4chan.org/")
 
 (global-set-key (kbd "C-c C-r gr") 'yon-possibly-greenify-line)
+(global-set-key (kbd "C-c C-r gl") 'yon-apply-greenstuff)
 
 (defface yon-chan-greentext
   '((default :weight bold)
@@ -74,9 +74,10 @@
 
 (defun yon-apply-greenstuff ()
   "Checks each line for greentext replacement."
+  (interactive)
   (save-excursion
     (goto-char (point-min))
-    (cl-loop until (eobp) do (possibly-greenify-line) (forward-line 1))))
+    (cl-loop until (eobp) do (yon-possibly-greenify-line) (forward-line 1))))
 
 (defun yon-get-line-content ()
   (save-excursion
