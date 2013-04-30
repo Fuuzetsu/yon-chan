@@ -39,7 +39,7 @@
 
 (defvar yon-api-url "http://api.4chan.org/")
 
-(global-set-key (kbd "C-c C-r gr") 'yon-possibly-greenify-line)
+(global-set-key (kbd "C-c C-r gd") 'yon-apply-deadlinks)
 (global-set-key (kbd "C-c C-r gl") 'yon-apply-greenstuff)
 
 (defface yon-chan-greentext
@@ -67,6 +67,12 @@
     (((class color)) :foreground "red3"))
   "Basic face for the poster number.")
 
+(defface yon-chan-deadlink
+  '((default :strike-through t)
+    (((class color)) :foreground "red2"))
+  "Basic face for dead cross-links.")
+
+
 (defun yon-clean-html-string (body)
   (let* ((replace-list (list '("&#039;" . "'")
                              '("&gt;" . ">")
@@ -79,14 +85,6 @@
                       (car y) (cdr y) x))))
     (reduce replacer (cons body replace-list))))
 
-
-;; interactive for testing
-(defun yon-apply-greenstuff ()
-  "Checks each line for greentext replacement."
-  (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (cl-loop until (eobp) do (yon-possibly-greenify-line) (forward-line 1))))
 
 (defun yon-get-line-content ()
   (save-excursion
@@ -104,12 +102,13 @@
 
 
 ;; Interactive for now for testing
-(defun yon-possibly-greenify-line ()
+(defun yon-possibly-colorify-line-by-tags
+  (opregex endregex colourface &optional newline)
   "Least elegant function that will replace quotes with greentext."
   (interactive)
-  (let ((start (string-match "<span class=\"quote\">" (yon-get-line-content)))
-        (op "<span class=\"quote\">")
-        (ed "</span>"))
+  (let ((start (string-match opregex (yon-get-line-content)))
+        (op opregex)
+        (ed endregex))
     (when start
       (let* ((startn (+ start (line-beginning-position)))
              (end (+ (yon-get-closing-point
@@ -126,8 +125,42 @@
                                                     (length ed))))))
             (progn
               (delete-char (length cont))
-              (insert (propertize (yon-strip-newlines cont)
-                                  'face 'yon-chan-greentext)))))))))
+              (if newline
+                  (insert (propertize (yon-strip-newlines cont)
+                                      'face colourface))
+                (insert (propertize cont
+                                    'face colourface))))))))))
+
+
+;; interactive for testing
+(defun yon-apply-deadlinks ()
+  "Checks each line for deadlink replacement."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
+                              "<span class=\"deadlink\">" "</span>"
+                              'yon-chan-deadlink t)
+             (forward-line 1))))
+
+;; interactive for testing
+(defun yon-apply-greenstuff ()
+  "Checks each line for greentext replacement."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
+                              "<span class=\"quote\">" "</span>"
+                              'yon-chan-greentext t)
+             (forward-line 1))))
+
+;; Interactive for now for testing
+(defun yon-possibly-greenify-line ()
+  "Least elegant function that will replace quotes with greentext."
+  (interactive)
+  (let ((op "<span class=\"quote\">")
+        (ed "</span>")))
+  )
 
 (defun yon-strip-newlines (body)
   (replace-regexp-in-string "\n" "" body))
@@ -162,6 +195,7 @@
     (setq buffer-read-only nil)
     (funcall proc json)
     (yon-apply-greenstuff)
+    (yon-apply-deadlinks)
     (setq buffer-read-only t)))
 
 (defun yon-render-board (catalog)
@@ -218,7 +252,7 @@
 
 ;; let's hard code this for now
 (defun yon-browse-g (buffer)
-  (url-retrieve "http://api.4chan.org/g/catalog.json"
+  (url-retrieve "http://api.4chan.org/q/catalog.json"
                 (lexical-let ((yon-buffer buffer))
                   (lambda (status)
                     (yon-render yon-buffer

@@ -1,4 +1,4 @@
-Feature: Greentext
+Feature: Highlighting
   
   Scenario: Highlighting greentext single-line
     When I insert:
@@ -6,7 +6,7 @@ Feature: Greentext
     <span class="quote">>Single line greentext</span>
     """
     When I go to beginning of buffer
-    And I press "C-c C-r gr"
+    And I press "C-c C-r gl"
     Then I should see exactly:
     """
     >Single line greentext
@@ -20,7 +20,7 @@ Feature: Greentext
     text</span>
     """
     When I go to beginning of buffer
-    And I press "C-c C-r gr"
+    And I press "C-c C-r gl"
     Then I should see exactly:
     """
     >Multi line greentext
@@ -32,7 +32,7 @@ Feature: Greentext
     <span class="quote">></span>
     """
     When I go to beginning of buffer
-    And I press "C-c C-r gr"
+    And I press "C-c C-r gl"
     Then I should see exactly:
     """
     >
@@ -44,7 +44,7 @@ Feature: Greentext
     Hello world! Nothing to see here.
     """
     When I go to beginning of buffer
-    And I press "C-c C-r gr"
+    And I press "C-c C-r gl"
     Then I should see exactly:
     """
     Hello world! Nothing to see here.
@@ -57,7 +57,7 @@ Feature: Greentext
     Long lines are long.
     """
     When I go to beginning of buffer
-    And I press "C-c C-r gr"
+    And I press "C-c C-r gl"
     Then I should see exactly:
     """
     >please go OP
@@ -100,4 +100,25 @@ Feature: Greentext
     Long lines are long.
     >test test test
     bottom
+    """
+
+  Scenario: Cross-out dead cross-link
+    When I insert:
+    """
+    whatever
+    hello <span class="deadlink">>>>/int/10421017</span> welp
+    hi
+    <span class="deadlink">>>>/int/120
+    21017</span>
+    bleh
+    """
+    When I go to beginning of buffer
+    And I press "C-c C-r gd"
+    Then I should see exactly:
+    """
+    whatever
+    hello >>>/int/10421017 welp
+    hi
+    >>>/int/12021017
+    bleh
     """
