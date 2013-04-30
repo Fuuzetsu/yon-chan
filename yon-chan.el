@@ -28,7 +28,7 @@
 (require 'json)
 
 (define-derived-mode yon-chan-mode
-  special-mode "4chan"
+  special-mode "Yon-chan"
   "4chan browser.")
 
 ;; (defun yon-mode-keys ()
@@ -126,4 +126,4 @@
     (yon-browse-g (current-buffer))))
 
 (provide 'yon-chan)
-;;; 4chan.el ends here
+;;; yon-chan.el ends here
