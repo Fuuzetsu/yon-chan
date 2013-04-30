@@ -26,6 +26,7 @@
 ;;; Code:
 
 (require 'json)
+(require 'cl)
 
 (define-derived-mode yon-chan-mode
   special-mode "4chan"
@@ -36,6 +37,17 @@
 ;;   (define-key yon-mode-map "q" 'quit-window)
 
 (defvar yon-api-url "http://api.4chan.org/")
+
+(defun yon-clean-post-body (body)
+  (let* ((replace-list (list '("&#039;" . "'")
+                             '("&gt;" . ">")
+                             '("&lt;" . "<")
+                             '("<br>" . "\n")))
+         (replacer (lambda (x y)
+                     (replace-regexp-in-string
+                      (car y) (cdr y) x))))
+    (reduce replacer (cons body replace-list))))
+
 
 (defun yon-elem (alst key &optional default)
   (lexical-let ((elem (cdr (assoc key alst))))
@@ -89,7 +101,7 @@
   (insert " - No. ")
   (insert (number-to-string (yon-elem post 'no)))
   (newline)
-  (insert (yon-elem post 'com ""))
+  (insert (yon-clean-post-body (yon-elem post 'com "")))
   (newline)
   (newline))
 
@@ -103,7 +115,7 @@
   (insert (number-to-string (yon-elem post 'no)))
   (newline)
   (auto-fill-mode t)
-  (insert (yon-elem post 'com ""))
+  (insert (yon-clean-post-body (yon-elem post 'com "")))
   (auto-fill-mode nil)
   (newline)
   (newline))
