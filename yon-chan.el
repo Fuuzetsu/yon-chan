@@ -62,16 +62,8 @@
                       (car y) (cdr y) x))))
     (reduce replacer (cons body replace-list))))
 
-(defun yon-apply-greentext ()
-  "Applies a greentext face to the whole page content."
-  (interactive)
-  (save-excursion
-    (goto-char (point-min))
-    (message "applying greentext to %s" (buffer-name))
-    (message "that buffer has %s chars in it" (buffer-size))
-    (while (re-search-forward "<span class=\"quote\">\\(.+?\\)</span>" nil t)
-      (replace-match "\\1"))))
 
+;; interactive for testing
 (defun yon-apply-greenstuff ()
   "Checks each line for greentext replacement."
   (interactive)
@@ -93,6 +85,7 @@
   (save-excursion
     (buffer-substring start end)))
 
+;; Interactive for now for testing
 (defun yon-possibly-greenify-line ()
   "Least elegant function that will replace quotes with greentext."
   (interactive)
@@ -101,12 +94,10 @@
         (ed "</span>"))
     (when start
       (let* ((startn (+ start (line-beginning-position)))
-             (end (+ (yon-get-closing-point (yon-get-section startn (point-max)) ed)
+             (end (+ (yon-get-closing-point
+                      (yon-get-section startn (point-max)) ed)
                      startn)))
         (save-excursion
-          (message "%s" startn)
-          (message "%s" end)
-          (message "%s" (yon-get-section startn end))
           (goto-char startn)
           (delete-char (length op))
           (goto-char (- end (length op)))
