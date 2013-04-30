@@ -50,7 +50,7 @@
     (((class color)) :foreground "green"))
   "Basic greentext face for all the implications we can imply.")
 
-(defun yon-clean-post-body (body)
+(defun yon-clean-html-string (body)
   (let* ((replace-list (list '("&#039;" . "'")
                              '("&gt;" . ">")
                              '("&lt;" . "<")
@@ -108,13 +108,14 @@
                                                     (length ed))))))
             (progn
               (delete-char (length cont))
-              (insert (propertize (yon-strip-newlines cont) 'face 'yon-chan-greentext)))))))))
+              (insert (propertize (yon-strip-newlines cont)
+                                  'face 'yon-chan-greentext)))))))))
 
 (defun yon-strip-newlines (body)
   (replace-regexp-in-string "\n" "" body))
 
 (defun yon-process-post (body)
-  (let* ((cleaned (yon-clean-post-body body)))
+  (let* ((cleaned (yon-clean-html-string body)))
     cleaned))
 
 (defun yon-elem (alst key &optional default)
@@ -162,12 +163,7 @@
 ;; Possible Output:
 ;;   Subject - No Subject
 (defun yon-render-post (post)
-  (insert (yon-elem post 'sub "No subject"))
-  (insert " - ")
-  (insert (yon-elem post 'name "No name"))
-  (insert " - ")
-  (insert (yon-elem post 'now))
-  (insert " - No. ")
+  (yon-insert-header post)
   (insert (number-to-string (yon-elem post 'no)))
   (newline)
   (insert (yon-process-post (yon-elem post 'com "")))
@@ -175,6 +171,7 @@
   (newline))
 
 (defun yon-render-op-post (post)
+  (yon-insert-header post)
   (insert (yon-elem post 'sub "No subject"))
   (insert " - ")
   (insert (yon-elem post 'name "No name"))
@@ -187,6 +184,16 @@
   (insert (yon-process-post (yon-elem post 'com "")))
   (auto-fill-mode nil)
   (newline)
+  (newline))
+
+(defun yon-insert-header (post)
+  (insert (yon-elem post 'sub "No subject"))
+  (insert " - ")
+  (insert (yon-elem post 'name "No name"))
+  (insert " - ")
+  (insert (yon-elem post 'now))
+  (insert " - No. ")
+  (insert (number-to-string (yon-elem post 'no)))
   (newline))
 
 ;; let's hard code this for now
