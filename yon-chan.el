@@ -158,4 +158,4 @@
     (yon-browse-g (current-buffer))))
 
 (provide 'yon-chan)
-;;; 4chan.el ends here
+;;; yon-chan.el ends here
