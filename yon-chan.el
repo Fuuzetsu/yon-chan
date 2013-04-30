@@ -79,13 +79,18 @@
     (cl-loop until (eobp) do (possibly-greenify-line) (forward-line 1))))
 
 (defun yon-get-line-content ()
-  (let ((pos-end (line-beginning-position 2)))
-    (buffer-substring (line-beginning-position) pos-end)))
+  (save-excursion
+   (let ((pos-end (line-beginning-position 2)))
+     (buffer-substring (line-beginning-position) pos-end))))
 
 (defun yon-get-closing-point (bufstr close)
-  (let (( match (string-match close bufstr)))
+  (let ((match (string-match close bufstr)))
     (when match
       (+ match (length close)))))
+
+(defun yon-get-section (start end)
+  (save-excursion
+    (buffer-substring start end)))
 
 (defun yon-possibly-greenify-line ()
   "Least elegant function that will replace quotes with greentext."
@@ -95,16 +100,20 @@
         (ed "</span>"))
     (when start
       (let* ((startn (+ start (line-beginning-position)))
-             (end (yon-get-closing-point (buffer-substring startn (point-max)) ed)))
+             (end (+ (yon-get-closing-point (yon-get-section startn (point-max)) ed)
+                     startn)))
         (save-excursion
+          (message "%s" startn)
+          (message "%s" end)
+          (message "%s" (yon-get-section startn end))
           (goto-char startn)
           (delete-char (length op))
-          (goto-char end)
+          (goto-char (- end (length op)))
           (delete-backward-char (length ed))
           (goto-char startn)
-          (let ((cont (buffer-substring startn (- end
-                                                  (+ (length op)
-                                                     (length ed))))))
+          (let ((cont (yon-get-section startn (- end
+                                                 (+ (length op)
+                                                    (length ed))))))
             (progn
               (delete-char (length cont))
               (insert (propertize cont 'face 'yon-chan-greentext)))))))))
