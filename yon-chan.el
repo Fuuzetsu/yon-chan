@@ -32,11 +32,15 @@
   special-mode "4chan"
   "4chan browser.")
 
+
 ;; (defun yon-mode-keys ()
 ;;   "Set local key defs for yon-mode"
 ;;   (define-key yon-mode-map "q" 'quit-window)
 
 (defvar yon-api-url "http://api.4chan.org/")
+
+(global-set-key (kbd "C-c C-r gr") 'yon-possibly-greenify-line)
+(global-set-key (kbd "C-c C-r gl") 'yon-apply-greenstuff)
 
 (defface yon-chan-greentext
   '((default :weight bold)
@@ -58,16 +62,57 @@
                       (car y) (cdr y) x))))
     (reduce replacer (cons body replace-list))))
 
-;; (defun yon-apply-greentext (body)
-;;   replace-regexp-in-string "<span class=\"quote\">\\(.+?\\)</span>"
-;;   "")
+
+;; interactive for testing
+(defun yon-apply-greenstuff ()
+  "Checks each line for greentext replacement."
+  (interactive)
+  (save-excursion
+    (goto-char (point-min))
+    (cl-loop until (eobp) do (yon-possibly-greenify-line) (forward-line 1))))
+
+(defun yon-get-line-content ()
+  (save-excursion
+   (let ((pos-end (line-beginning-position 2)))
+     (buffer-substring (line-beginning-position) pos-end))))
+
+(defun yon-get-closing-point (bufstr close)
+  (let ((match (string-match close bufstr)))
+    (when match
+      (+ match (length close)))))
+
+(defun yon-get-section (start end)
+  (save-excursion
+    (buffer-substring start end)))
+
+;; Interactive for now for testing
+(defun yon-possibly-greenify-line ()
+  "Least elegant function that will replace quotes with greentext."
+  (interactive)
+  (let ((start (string-match "^<span class=\"quote\">" (yon-get-line-content)))
+        (op "<span class=\"quote\">")
+        (ed "</span>"))
+    (when start
+      (let* ((startn (+ start (line-beginning-position)))
+             (end (+ (yon-get-closing-point
+                      (yon-get-section startn (point-max)) ed)
+                     startn)))
+        (save-excursion
+          (goto-char startn)
+          (delete-char (length op))
+          (goto-char (- end (length op)))
+          (delete-backward-char (length ed))
+          (goto-char startn)
+          (let ((cont (yon-get-section startn (- end
+                                                 (+ (length op)
+                                                    (length ed))))))
+            (progn
+              (delete-char (length cont))
+              (insert (propertize cont 'face 'yon-chan-greentext)))))))))
 
 (defun yon-process-post (body)
-  (let* ((cleaned (yon-clean-post-body body))
-        ;; (greened (yon-apply-greentext cleaned))
-         )
+  (let* ((cleaned (yon-clean-post-body body)))
     cleaned))
-
 
 (defun yon-elem (alst key &optional default)
   (lexical-let ((elem (cdr (assoc key alst))))
@@ -94,10 +139,11 @@
   (with-current-buffer buffer
     (setq buffer-read-only nil)
     (funcall proc json)
+    (yon-apply-greenstuff)
     (setq buffer-read-only t)))
 
 (defun yon-render-board (catalog)
-    (mapc 'yon-render-page catalog))
+  (mapc 'yon-render-page catalog))
 
 (defun yon-render-page (page)
   (mapc 'yon-render-op-post (yon-elem page 'threads)))
@@ -156,6 +202,7 @@
   (with-current-buffer (switch-to-buffer-other-window (generate-new-buffer "*4chan*"))
     (yon-chan-mode)
     (yon-browse-g (current-buffer))))
+
 
 (provide 'yon-chan)
 ;;; yon-chan.el ends here
