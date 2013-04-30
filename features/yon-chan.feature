@@ -5,6 +5,7 @@ Feature: Greentext
     """
     <span class="quote">>Single line greentext</span>
     """
+    When I go to the beginning of the buffer
     And I press "C-c C-r gr"
     Then I should see exactly:
     """
@@ -18,6 +19,7 @@ Feature: Greentext
     green
     text</span>
     """
+    When I go to the beginning of the buffer
     And I press "C-c C-r gr"
     Then I should see exactly:
     """
@@ -31,6 +33,7 @@ Feature: Greentext
     """
     <span class="quote">></span>
     """
+    When I go to the beginning of the buffer
     And I press "C-c C-r gr"
     Then I should see exactly:
     """
