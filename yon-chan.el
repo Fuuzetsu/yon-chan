@@ -79,7 +79,8 @@
                              '("&lt;" . "<")
                              '("&quot;" . "\"")
                              '("&amp;" . "&")
-                             '("<br>" . "\n")))
+                             '("<br>" . "\n")
+                             '("<wbr>" . "")))
          (replacer (lambda (x y)
                      (replace-regexp-in-string
                       (car y) (cdr y) x))))
