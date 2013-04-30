@@ -6,9 +6,9 @@ Feature: Greentext
     <span class="quote">>Single line greentext</span>
     """
     And I press "C-c C-r gr"
-    Then I should see:
+    Then I should see exactly:
     """
-    Single line greentext
+    >Single line greentext
     """
 
   Scenario: Highlighting greentext multi-line
@@ -19,9 +19,9 @@ Feature: Greentext
     text</span>
     """
     And I press "C-c C-r gr"
-    Then I should see:
+    Then I should see exactly:
     """
-    Multi line
+    >Multi line
     green
     text
     """
@@ -32,7 +32,7 @@ Feature: Greentext
     <span class="quote">></span>
     """
     And I press "C-c C-r gr"
-    Then I should see:
+    Then I should see exactly:
     """
     >
     """

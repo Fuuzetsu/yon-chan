@@ -11,3 +11,10 @@
               (message "Can not go to character '%s' since it does not exist in the current buffer: %s"))
           (assert search nil message word (espuds-buffer-contents))
           (if (string-equal "front" pos) (backward-word)))))
+
+(Then "^I should see exactly\\(?: \"\\(.+\\)\"\\|:\\)$"
+      "Asserts that the current buffer includes some text."
+      (lambda (expected)
+        (let ((actual (espuds-buffer-contents))
+              (message "Expected '%s' and got '%s'."))
+          (assert (s-equals? expected actual) nil message expected actual))))
