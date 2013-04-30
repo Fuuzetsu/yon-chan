@@ -25,7 +25,7 @@
  )
 
 (Before
- ;; Before each scenario is run
+ (erase-buffer)
  )
 
 (After
