@@ -1,4 +1,4 @@
-;;; 4chan.el --- A 4chan browser for Emacs
+;;; yon-chan.el --- A 4chan browser for Emacs
 
 ;; Copyright (C) 2013  David Thompson
 
