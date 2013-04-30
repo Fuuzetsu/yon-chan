@@ -1,11 +1,12 @@
-Feature: Do Some things
-  In order to do something
-  As a user
-  I want to do something
+Feature: Greentext
   
-  Scenario: Do Something
-    Given I have "something"
-    When I have "something"
-    Then I should have "something"
-    And I should have "something"
-    But I should not have "something"
+  Scenario: Highlighting greentext single-line
+    When I insert:
+    """
+    <span class="quote">>what the fuck? 4 hours to charge?</span>
+    """
+    And I press "C-c C-r gr"
+    Then I should see:
+    """
+    >what the fuck? 4 hours to charge?
+    """

@@ -38,6 +38,8 @@
 
 (defvar yon-api-url "http://api.4chan.org/")
 
+(global-set-key (kbd "C-c C-r gr") 'yon-possibly-greenify-line)
+
 (defface yon-chan-greentext
   '((default :weight bold)
     (((class color) (min-colors 16) (background light)) :foreground "ForestGreen")
@@ -85,6 +87,7 @@
 
 (defun yon-possibly-greenify-line ()
   "Least elegant function that will replace quotes with greentext."
+  (interactive)
   (let ((start (+ (string-match "^<span class=\"quote\">" (get-line-content))
                   (line-beginning-position)))
         (op "<span class=\"quote\">")
