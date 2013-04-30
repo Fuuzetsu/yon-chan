@@ -88,21 +88,21 @@
 (defun yon-possibly-greenify-line ()
   "Least elegant function that will replace quotes with greentext."
   (interactive)
-  (let ((start (+ (string-match "^<span class=\"quote\">" (get-line-content))
-                  (line-beginning-position)))
+  (let ((start (string-match "^<span class=\"quote\">" (get-line-content)))
         (op "<span class=\"quote\">")
         (ed "</span>"))
     (when start
-      (let ((end (get-closing-point (buffer-substring start (point-max)) ed)))
+      (let* ((startn (+ start (line-beginning-position)))
+             (end (get-closing-point (buffer-substring startn (point-max)) ed)))
         (save-excursion
-          (goto-char start)
+          (goto-char startn)
           (delete-char (length op))
           (goto-char end)
           (delete-backward-char (length ed))
-          (goto-char start)
-          (let ((cont (buffer-substring start (- end
-                                                 (+ (length op)
-                                                    (length ed))))))
+          (goto-char startn)
+          (let ((cont (buffer-substring startn (- end
+                                                  (+ (length op)
+                                                     (length ed))))))
             (progn
               (delete-char (length cont))
               (insert (propertize cont 'face 'yon-chan-greentext)))))))))
