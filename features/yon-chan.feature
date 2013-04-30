@@ -83,17 +83,21 @@ Feature: Greentext
   Scenario: Multi-quote
     When I insert:
     """
+    top
     <span class="quote">>please go OP</span>
     <span class="quote">>staying</span>
     Long lines are long.
     <span class="quote">>test test test</span>
+    bottom
     """
     When I go to beginning of buffer
     And I press "C-c C-r gl"
     Then I should see exactly:
     """
+    top
     >please go OP
     >staying
     Long lines are long.
     >test test test
+    bottom
     """

@@ -102,11 +102,12 @@
   (save-excursion
     (buffer-substring start end)))
 
+
 ;; Interactive for now for testing
 (defun yon-possibly-greenify-line ()
   "Least elegant function that will replace quotes with greentext."
   (interactive)
-  (let ((start (string-match "^<span class=\"quote\">" (yon-get-line-content)))
+  (let ((start (string-match "<span class=\"quote\">" (yon-get-line-content)))
         (op "<span class=\"quote\">")
         (ed "</span>"))
     (when start
