@@ -253,7 +253,7 @@
 
 ;; let's hard code this for now
 (defun yon-browse-g (buffer)
-  (url-retrieve "http://api.4chan.org/q/catalog.json"
+  (url-retrieve "http://api.4chan.org/g/catalog.json"
                 (lexical-let ((yon-buffer buffer))
                   (lambda (status)
                     (yon-render yon-buffer
