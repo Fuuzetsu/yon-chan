@@ -38,15 +38,35 @@
 
 (defvar yon-api-url "http://api.4chan.org/")
 
+(defface yon-chan-greentext
+  '((default :weight bold)
+    (((class color) (min-colors 16) (background light)) :foreground "ForestGreen")
+    (((class color) (min-colors 88) (background dark))  :foreground "Green1")
+    (((class color) (min-colors 16) (background dark))  :foreground "Green")
+    (((class color)) :foreground "green"))
+  "Basic greentext face for all the implications we can imply.")
+
 (defun yon-clean-post-body (body)
   (let* ((replace-list (list '("&#039;" . "'")
                              '("&gt;" . ">")
                              '("&lt;" . "<")
+                             '("&quot;" . "\"")
+                             '("&amp;" . "&")
                              '("<br>" . "\n")))
          (replacer (lambda (x y)
                      (replace-regexp-in-string
                       (car y) (cdr y) x))))
     (reduce replacer (cons body replace-list))))
+
+;; (defun yon-apply-greentext (body)
+;;   replace-regexp-in-string "<span class=\"quote\">\\(.+?\\)</span>"
+;;   "")
+
+(defun yon-process-post (body)
+  (let* ((cleaned (yon-clean-post-body body))
+        ;; (greened (yon-apply-greentext cleaned))
+         )
+    cleaned))
 
 
 (defun yon-elem (alst key &optional default)
@@ -101,7 +121,7 @@
   (insert " - No. ")
   (insert (number-to-string (yon-elem post 'no)))
   (newline)
-  (insert (yon-clean-post-body (yon-elem post 'com "")))
+  (insert (yon-process-post (yon-elem post 'com "")))
   (newline)
   (newline))
 
@@ -115,7 +135,7 @@
   (insert (number-to-string (yon-elem post 'no)))
   (newline)
   (auto-fill-mode t)
-  (insert (yon-clean-post-body (yon-elem post 'com "")))
+  (insert (yon-process-post (yon-elem post 'com "")))
   (auto-fill-mode nil)
   (newline)
   (newline))
