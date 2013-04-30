@@ -12,6 +12,18 @@
           (assert search nil message word (espuds-buffer-contents))
           (if (string-equal "front" pos) (backward-word)))))
 
+(When "^I go to the \\(beginning\\|end\\) of the \\(line\\|buffer\\)$"
+      (lambda (pos word)
+        (if (string-equal "front" pos) (backward-word)
+          (if (string-equal "line" word)
+              (move-beginning-of-line)
+            (beginning-of-buffer))
+          (if (string-equal "line" word)
+              (move-end-of-line)
+            (end-of-buffer)))))
+
+
+
 (Then "^I should see exactly\\(?: \"\\(.+\\)\"\\|:\\)$"
       "Asserts that the current buffer includes some text."
       (lambda (expected)
