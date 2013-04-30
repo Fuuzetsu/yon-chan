@@ -74,7 +74,7 @@ Feature: Greentext
     Hi!
     """
     When I go to beginning of buffer
-    And I press "C-c C-r gr"
+    And I press "C-c C-r gl"
     Then I should see exactly:
     """
     Hello world!
