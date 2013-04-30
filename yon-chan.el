@@ -32,6 +32,8 @@
   special-mode "4chan"
   "4chan browser.")
 
+
+
 ;; (defun yon-mode-keys ()
 ;;   "Set local key defs for yon-mode"
 ;;   (define-key yon-mode-map "q" 'quit-window)
@@ -76,11 +78,11 @@
     (goto-char (point-min))
     (cl-loop until (eobp) do (possibly-greenify-line) (forward-line 1))))
 
-(defun get-line-content ()
+(defun yon-get-line-content ()
   (let ((pos-end (line-beginning-position 2)))
     (buffer-substring (line-beginning-position) pos-end)))
 
-(defun get-closing-point (bufstr close)
+(defun yon-get-closing-point (bufstr close)
   (let (( match (string-match close bufstr)))
     (when match
       (+ match (length close)))))
@@ -88,12 +90,12 @@
 (defun yon-possibly-greenify-line ()
   "Least elegant function that will replace quotes with greentext."
   (interactive)
-  (let ((start (string-match "^<span class=\"quote\">" (get-line-content)))
+  (let ((start (string-match "^<span class=\"quote\">" (yon-get-line-content)))
         (op "<span class=\"quote\">")
         (ed "</span>"))
     (when start
       (let* ((startn (+ start (line-beginning-position)))
-             (end (get-closing-point (buffer-substring startn (point-max)) ed)))
+             (end (yon-get-closing-point (buffer-substring startn (point-max)) ed)))
         (save-excursion
           (goto-char startn)
           (delete-char (length op))
@@ -199,6 +201,7 @@
   (with-current-buffer (switch-to-buffer-other-window (generate-new-buffer "*4chan*"))
     (yon-chan-mode)
     (yon-browse-g (current-buffer))))
+
 
 (provide 'yon-chan)
 ;;; 4chan.el ends here
