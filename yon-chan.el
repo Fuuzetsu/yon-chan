@@ -43,12 +43,29 @@
 (global-set-key (kbd "C-c C-r gl") 'yon-apply-greenstuff)
 
 (defface yon-chan-greentext
-  '((default :weight bold)
+  '((default)
     (((class color) (min-colors 16) (background light)) :foreground "ForestGreen")
-    (((class color) (min-colors 88) (background dark))  :foreground "Green1")
-    (((class color) (min-colors 16) (background dark))  :foreground "Green")
-    (((class color)) :foreground "green"))
+    (((class color) (min-colors 88) (background dark))  :foreground "green3")
+    (((class color) (min-colors 16) (background dark))  :foreground "green3")
+    (((class color)) :foreground "green3"))
   "Basic greentext face for all the implications we can imply.")
+
+(defface yon-chan-poster
+  '((default :weight bold)
+    (((class color) (min-colors 16) (background light)) :foreground "purple4")
+    (((class color) (min-colors 16) (background dark))  :foreground "purple2")
+    (((class color)) :foreground "purple"))
+  "Basic face for the poster name.")
+
+(defface yon-chan-topic-name
+  '((default :weight bold)
+    (((class color)) :foreground "brown"))
+  "Basic face for the topic name.")
+
+(defface yon-chan-post-number
+  '((default :weight bold)
+    (((class color)) :foreground "red3"))
+  "Basic face for the poster number.")
 
 (defun yon-clean-html-string (body)
   (let* ((replace-list (list '("&#039;" . "'")
@@ -178,14 +195,24 @@
   (newline)
   (newline))
 
+
 (defun yon-insert-header (post)
-  (insert (yon-clean-html-string (yon-elem post 'sub "No subject")))
+  (insert
+   (propertize
+    (yon-clean-html-string (yon-elem post 'sub "No subject"))
+    'face 'yon-chan-topic-name))
   (insert " - ")
-  (insert (yon-clean-html-string (yon-elem post 'name "No name")))
+  (insert
+   (propertize
+    (yon-clean-html-string (yon-elem post 'name "No name"))
+    'face 'yon-chan-poster))
   (insert " - ")
   (insert (yon-clean-html-string (yon-elem post 'now)))
-  (insert " - No. ")
-  (insert (number-to-string (yon-elem post 'no)))
+  (insert " - ")
+  (insert
+   (propertize
+    (concat "No. "(number-to-string (yon-elem post 'no)))
+    'face 'yon-chan-post-number))
   (newline))
 
 ;; let's hard code this for now
@@ -201,7 +228,8 @@
 (defun yon-chan ()
   "Load 4chan."
   (interactive)
-  (with-current-buffer (switch-to-buffer-other-window (generate-new-buffer "*4chan*"))
+  (with-current-buffer (switch-to-buffer-other-window
+                        (generate-new-buffer "*4chan*"))
     (yon-chan-mode)
     (yon-browse-g (current-buffer))))
 
