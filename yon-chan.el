@@ -262,10 +262,10 @@
 
 ;;;###autoload
 (defun yon-chan ()
-  "Load 4chan."
+  "Fetch and display 4chan boards."
   (interactive)
   (with-current-buffer (switch-to-buffer-other-window
-                        (generate-new-buffer "*4chan*"))
+                        (generate-new-buffer "*yon-chan*"))
     (yon-chan-mode)
     (yon-browse-g (current-buffer))))
 
