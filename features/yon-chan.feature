@@ -12,6 +12,20 @@ Feature: Greentext
     >Single line greentext
     """
 
+  Scenario: Highlighting greentext multi-line
+    When I insert:
+    """
+    <span class="quote">>Multi line 
+    green
+    text</span>
+    """
+    When I go to beginning of buffer
+    And I press "C-c C-r gr"
+    Then I should see exactly:
+    """
+    >Multi line greentext
+    """
+
   Scenario: Highlighting empty greentext
     When I insert:
     """
