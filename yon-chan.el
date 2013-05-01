@@ -2,7 +2,7 @@
 
 ;; Copyright (C) 2013  David Thompson
 
-;; Author: David Thompson <dave@labrys>
+;; Author: David Thompson <dthompson@member.fsf.org>
 ;; Keywords: hypermedia, games
 
 ;; This program is free software; you can redistribute it and/or modify
