@@ -28,19 +28,20 @@
 (require 'json)
 (require 'cl)
 
+;;; Yon-chan mode
+
 (define-derived-mode yon-chan-mode
   special-mode "Yon-chan"
   "4chan browser.")
-
 
 ;; (defun yon-mode-keys ()
 ;;   "Set local key defs for yon-mode"
 ;;   (define-key yon-mode-map "q" 'quit-window)
 
-(defvar yon-api-url "http://api.4chan.org/")
-
 (global-set-key (kbd "C-c C-r gd") 'yon-apply-deadlinks)
 (global-set-key (kbd "C-c C-r gl") 'yon-apply-greenstuff)
+
+;;; Faces
 
 (defface yon-chan-greentext
   '((default)
@@ -72,6 +73,7 @@
     (((class color)) :foreground "red2"))
   "Basic face for dead cross-links.")
 
+;;; Comment sanitization and processing
 
 (defun yon-clean-html-string (body)
   (let* ((replace-list (list '("&#039;" . "'")
@@ -170,7 +172,12 @@
   (let* ((cleaned (yon-clean-html-string body)))
     cleaned))
 
+;;; 4chan JSON API
+
+(defvar yon-api-url "http://api.4chan.org/")
+
 (defun yon-elem (alst key &optional default)
+  "Fetch value from alist with a default value if key is not present."
   (lexical-let ((elem (cdr (assoc key alst))))
     (if elem
         elem
@@ -190,6 +197,8 @@
 
 (defun yon-get-and-parse-json ()
   (yon-parse-json (yon-get-json-from-current-buffer)))
+
+;;; Rendering
 
 (defun yon-render (buffer proc json)
   (with-current-buffer buffer
@@ -230,7 +239,6 @@
   (auto-fill-mode nil)
   (newline)
   (newline))
-
 
 (defun yon-insert-header (post)
   (insert
