@@ -28,4 +28,21 @@ test</span>"))
     (should (eql (string-match "<span class=\"quote\">" multi-text) 3))
     (should (eql (string-match "<span class=\"quote\">" long-multi-text) 10))))
 
+;;; Posts
+
+(ert-deftest yon-build-post ()
+  "Test building post objects from deserialized JSON."
+  (let ((response '((sub "Hello world")
+                    (name "Anonymous")
+                    (now "right now")
+                    (no 9001)
+                    (com "This is a test")))
+        (expected (make-yon-post :subject "Hello world"
+                                 :author "Anonymous"
+                                 :timestamp "right now"
+                                 :number 9001
+                                 :comment "This is a test")))
+    (should (equalp (yon-build-post response) expected))))
+
+
 (provide 'yon-chan-tests)

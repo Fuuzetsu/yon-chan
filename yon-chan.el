@@ -198,6 +198,21 @@
 (defun yon-get-and-parse-json ()
   (yon-parse-json (yon-get-json-from-current-buffer)))
 
+;;; Posts
+
+;; The atoms of 4chan.
+
+(cl-defstruct yon-post
+  subject author timestamp number comment)
+
+(defun yon-build-post (response)
+  "Builds a post object from deserialized JSON response."
+  (make-yon-post :subject   (yon-elem response 'sub "No subject")
+                 :author    (yon-elem response 'name "Anonymous")
+                 :timestamp (yon-elem response 'now)
+                 :number    (yon-elem response 'no)
+                 :comment   (yon-elem response 'com)))
+
 ;;; Rendering
 
 (defun yon-render (buffer proc json)
