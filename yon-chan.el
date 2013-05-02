@@ -178,7 +178,7 @@
 
 (defun yon-elem (alst key &optional default)
   "Fetch value from alist with a default value if key is not present."
-  (lexical-let ((elem (cdr (assoc key alst))))
+  (lexical-let ((elem (cadr (assoc key alst))))
     (if elem
         elem
       default)))

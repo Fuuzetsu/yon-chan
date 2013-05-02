@@ -28,9 +28,17 @@ test</span>"))
     (should (eql (string-match "<span class=\"quote\">" multi-text) 3))
     (should (eql (string-match "<span class=\"quote\">" long-multi-text) 10))))
 
+;; Utils
+
+(deftest test-yon-elem ()
+  "Test deserialized JSON value fetching"
+  (should (string= (yon-elem '((foo "bar")) 'foo) "bar"))
+  (should (string= (yon-elem '() 'foo) nil))
+  (should (string= (yon-elem '() 'foo "bar") "bar")))
+
 ;;; Posts
 
-(ert-deftest yon-build-post ()
+(deftest yon-build-post ()
   "Test building post objects from deserialized JSON."
   (let ((response '((sub "Hello world")
                     (name "Anonymous")
@@ -43,6 +51,17 @@ test</span>"))
                                  :number 9001
                                  :comment "This is a test")))
     (should (equalp (yon-build-post response) expected))))
+
+(defvar response '((sub "Hello world")))
+
+(defvar expected (make-yon-post :subject "Hello world"))
+(car (yon-elem response 'sub))
+
+(equalp (yon-build-post response) expected)
+(yon-build-post response)
+[cl-struct-yon-post ("Hello world") ("Anonymous") ("right now") (9001) ("This is a test")]
+expected
+[cl-struct-yon-post "Hello world" "Anonymous" "right now" 9001 "This is a test"]
 
 
 (provide 'yon-chan-tests)
