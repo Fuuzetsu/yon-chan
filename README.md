@@ -1,4 +1,4 @@
-Yon-chan [![Build Status](https://travis-ci.org/davexunit/yon-chan.png)]
+Yon-chan ![Build Status](https://travis-ci.org/davexunit/yon-chan.png)
 ========
 
 An 4chan client for Emacs!
