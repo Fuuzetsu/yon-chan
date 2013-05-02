@@ -30,7 +30,7 @@ test</span>"))
 
 ;; Utils
 
-(deftest test-yon-elem ()
+(ert-deftest test-yon-elem ()
   "Test deserialized JSON value fetching"
   (should (string= (yon-elem '((foo . "bar")) 'foo) "bar"))
   (should (string= (yon-elem '() 'foo) nil))
@@ -38,7 +38,7 @@ test</span>"))
 
 ;;; Posts
 
-(deftest yon-build-post ()
+(ert-deftest yon-build-post ()
   "Test building post objects from deserialized JSON."
   (let ((response '((sub . "Hello world")
                     (name . "Anonymous")
