@@ -52,16 +52,4 @@ test</span>"))
                                  :comment "This is a test")))
     (should (equalp (yon-build-post response) expected))))
 
-(defvar response '((sub "Hello world")))
-
-(defvar expected (make-yon-post :subject "Hello world"))
-(car (yon-elem response 'sub))
-
-(equalp (yon-build-post response) expected)
-(yon-build-post response)
-[cl-struct-yon-post ("Hello world") ("Anonymous") ("right now") (9001) ("This is a test")]
-expected
-[cl-struct-yon-post "Hello world" "Anonymous" "right now" 9001 "This is a test"]
-
-
 (provide 'yon-chan-tests)
