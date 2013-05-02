@@ -283,13 +283,6 @@
                                   'yon-render-board
                                   (yon-get-and-parse-json))))))
 
-(defun yon-test-json ()
-  (url-retrieve "http://api.4chan.org/g/catalog.json"
-                (lambda (status)
-                  (message (yon-get-and-parse-json)))))
-(yon-test-json)
-
-
 ;;;###autoload
 (defun yon-chan ()
   "Fetch and display 4chan boards."
