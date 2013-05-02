@@ -11,9 +11,9 @@ test</span>")
         (long-multi-text "xxxxxxxxxx<span class=\"quote\">>Multieuoa
 anoethu
 test</span>"))
-    (should (eql (yon-get-closing-point simple-text "</span>") 40))
-    (should (eql (yon-get-closing-point multi-text "</span>") 41))
-    (should (eql (yon-get-closing-point long-multi-text "</span>") 60))))
+    (should (equal (yon-get-closing-point simple-text "</span>") 40))
+    (should (equal (yon-get-closing-point multi-text "</span>") 41))
+    (should (equal (yon-get-closing-point long-multi-text "</span>") 60))))
 
 
 (ert-deftest open-test-tag-finding ()
@@ -24,8 +24,8 @@ test</span>")
         (long-multi-text "xxxxxxxxxx<span class=\"quote\">>Multieuoa
 anoethu
 test</span>"))
-    (should (eql (string-match "<span class=\"quote\">" simple-text) 0))
-    (should (eql (string-match "<span class=\"quote\">" multi-text) 3))
-    (should (eql (string-match "<span class=\"quote\">" long-multi-text) 10))))
+    (should (equal (string-match "<span class=\"quote\">" simple-text) 0))
+    (should (equal (string-match "<span class=\"quote\">" multi-text) 3))
+    (should (equal (string-match "<span class=\"quote\">" long-multi-text) 10))))
 
 (provide 'yon-chan-tests)
