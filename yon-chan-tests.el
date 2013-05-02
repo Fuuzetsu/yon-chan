@@ -32,7 +32,7 @@ test</span>"))
 
 (deftest test-yon-elem ()
   "Test deserialized JSON value fetching"
-  (should (string= (yon-elem '((foo "bar")) 'foo) "bar"))
+  (should (string= (yon-elem '((foo . "bar")) 'foo) "bar"))
   (should (string= (yon-elem '() 'foo) nil))
   (should (string= (yon-elem '() 'foo "bar") "bar")))
 
@@ -40,11 +40,11 @@ test</span>"))
 
 (deftest yon-build-post ()
   "Test building post objects from deserialized JSON."
-  (let ((response '((sub "Hello world")
-                    (name "Anonymous")
-                    (now "right now")
-                    (no 9001)
-                    (com "This is a test")))
+  (let ((response '((sub . "Hello world")
+                    (name . "Anonymous")
+                    (now . "right now")
+                    (no . 9001)
+                    (com . "This is a test")))
         (expected (make-yon-post :subject "Hello world"
                                  :author "Anonymous"
                                  :timestamp "right now"

@@ -178,7 +178,7 @@
 
 (defun yon-elem (alst key &optional default)
   "Fetch value from alist with a default value if key is not present."
-  (lexical-let ((elem (cadr (assoc key alst))))
+  (lexical-let ((elem (cdr (assoc key alst))))
     (if elem
         elem
       default)))
@@ -282,6 +282,13 @@
                     (yon-render yon-buffer
                                   'yon-render-board
                                   (yon-get-and-parse-json))))))
+
+(defun yon-test-json ()
+  (url-retrieve "http://api.4chan.org/g/catalog.json"
+                (lambda (status)
+                  (message (yon-get-and-parse-json)))))
+(yon-test-json)
+
 
 ;;;###autoload
 (defun yon-chan ()
