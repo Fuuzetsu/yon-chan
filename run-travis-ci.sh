@@ -10,4 +10,9 @@ echo "ECUKES_EMACS = $ECUKES_EMACS"
 "$ECUKES_EMACS" --version
 echo
 
-exec ./run-tests.sh $TAGS
+./run-tests.sh $TAGS
+INTEGRATION=$?
+./run-unit-tests.sh
+UNIT=$?
+
+exit $INTEGRATION && $UNIT

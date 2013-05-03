@@ -2,8 +2,9 @@
 
 (require 'ert)
 (require 'yon-chan)
+(require 'mocker)
 
-(ert-deftest closed-test-tag-finding ()
+(ert-deftest test-yon-get-closing-point ()
   "Tests that quote tags are found properly in text"
   (let ((simple-text "<span class=\"quote\">>Hello world!</span>")
         (multi-text "xxx<span class=\"quote\">>Multi
@@ -16,7 +17,7 @@ test</span>"))
     (should (equal (yon-get-closing-point long-multi-text "</span>") 60))))
 
 
-(ert-deftest open-test-tag-finding ()
+(ert-deftest test-open-tag-finding ()
   "Tests that we can identify opening quote tag at the correct position"
   (let ((simple-text "<span class=\"quote\">>Hello world!</span>")
         (multi-text "xxx<span class=\"quote\">>Multi
