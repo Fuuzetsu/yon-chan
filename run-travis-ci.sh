@@ -12,7 +12,7 @@ echo
 
 ./run-tests.sh $TAGS
 INTEGRATION=$?
-$EMACS -batch -l ert -l yon-chan.el -l yon-chan-tests.el -f ert-run-tests-batch-and-exit
+$ECUKES_EMACS -batch -l ert -l elpa/mocker*/mocker.el -l yon-chan.el -l yon-chan-tests.el -f ert-run-tests-batch-and-exit
 UNIT=$?
 
 exit $INTEGRATION && $UNIT

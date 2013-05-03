@@ -2,6 +2,7 @@
 
 (require 'ert)
 (require 'yon-chan)
+(require 'mocker)
 
 (ert-deftest test-yon-get-closing-point ()
   "Tests that quote tags are found properly in text"
