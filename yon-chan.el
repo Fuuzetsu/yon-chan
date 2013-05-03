@@ -202,7 +202,11 @@
 ;; The atoms of 4chan.
 
 (cl-defstruct yon-post
-  subject author timestamp number comment)
+  subject author timestamp number comment
+  filename replyto sticky closed time trip id capcode country
+  country_name email ext fsize md5 image_w image_h thumbnail_w thumbnail_h
+  filedeleted spoiler custom_spoiler omitted_posts omitted_images replies
+  images bumplimit imagelimit)
 
 (defun yon-build-post (response)
   "Builds a post object from deserialized JSON response."
