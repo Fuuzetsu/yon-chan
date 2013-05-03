@@ -38,8 +38,6 @@
 ;;   "Set local key defs for yon-mode"
 ;;   (define-key yon-mode-map "q" 'quit-window)
 
-(global-set-key (kbd "C-c C-r gl") 'yon-apply-greentext)
-
 ;;; Faces
 
 (defface yon-chan-greentext
@@ -143,10 +141,8 @@
                               'yon-chan-deadlink t)
              (forward-line 1))))
 
-;; interactive for testing
 (defun yon-apply-greentext ()
   "Checks each line for greentext replacement."
-  (interactive)
   (save-excursion
     (goto-char (point-min))
     (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
