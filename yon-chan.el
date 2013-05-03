@@ -38,7 +38,6 @@
 ;;   "Set local key defs for yon-mode"
 ;;   (define-key yon-mode-map "q" 'quit-window)
 
-(global-set-key (kbd "C-c C-r gd") 'yon-apply-deadlinks)
 (global-set-key (kbd "C-c C-r gl") 'yon-apply-greenstuff)
 
 ;;; Faces
@@ -137,7 +136,6 @@
 ;; interactive for testing
 (defun yon-apply-deadlinks ()
   "Checks each line for deadlink replacement."
-  (interactive)
   (save-excursion
     (goto-char (point-min))
     (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags

@@ -126,6 +126,25 @@ Why haven't you joined the 144p master race yet /g/?")))))))
                                  :comment "This is a test")))
     (should (equalp (yon-build-post response) expected))))
 
+(ert-deftest test-yon-apply-deadlinks ()
+  "Test that deadlinks are properly caught and substituted"
+  (let ((input-text "top empty
+Midline deadlink <span class=\"deadlink\">>>>/g/123456</span> endline
+more text
+midbroken <span class=\"deadlink\">>>>/g/6425
+7533</span> deadlink
+end test")
+        (result-text "top empty
+Midline deadlink >>>/g/123456 endline
+more text
+midbroken >>>/g/64257533 deadlink
+end test"))
+    (with-temp-buffer
+      (insert input-text)
+      (yon-apply-deadlinks)
+      (message "%s" (buffer-string))
+      (should (string= result-text (buffer-string))))))
+
 ;;; Formatting
 
 (ert-deftest test-yon-format-post ()

@@ -101,24 +101,3 @@ Feature: Highlighting
     >test test test
     bottom
     """
-
-  Scenario: Cross-out dead cross-link
-    When I insert:
-    """
-    whatever
-    hello <span class="deadlink">>>>/int/10421017</span> welp
-    hi
-    <span class="deadlink">>>>/int/120
-    21017</span>
-    bleh
-    """
-    When I go to beginning of buffer
-    And I press "C-c C-r gd"
-    Then I should see exactly:
-    """
-    whatever
-    hello >>>/int/10421017 welp
-    hi
-    >>>/int/12021017
-    bleh
-    """
