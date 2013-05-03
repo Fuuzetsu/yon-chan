@@ -253,22 +253,27 @@ The header consists of the subject, author, timestamp, and post number."
           (yon-format-post-number post)))
 
 (defun yon-format-post-comment (post)
+  "Returns a processed comment string."
   (yon-process-post (yon-post-comment post)))
 
 (defun yon-format-post-subject (post)
+  "Returns a propertized, html-cleaned subject string."
   (propertize
     (yon-clean-html-string (yon-post-subject post))
     'face 'yon-face-post-subject))
 
 (defun yon-format-post-author (post)
+  "Returns a propertized, html-cleaned author string."
   (propertize
     (yon-clean-html-string (yon-post-author post))
     'face 'yon-face-post-author))
 
 (defun yon-format-post-timestamp (post)
+  "Returns an html-cleaned timestamp string."
   (yon-clean-html-string (yon-post-timestamp post)))
 
 (defun yon-format-post-number (post)
+  "Returns a propertized number string."
   (propertize
     (number-to-string (yon-post-number post))
     'face 'yon-face-post-number))
