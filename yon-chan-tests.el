@@ -143,7 +143,6 @@ end test"))
     (with-temp-buffer
       (insert input-text)
       (yon-apply-deadlinks)
-      (message "%s" (buffer-string))
       (should (string= result-text (buffer-string))))))
 
 (ert-deftest test-yon-apply-greentext ()

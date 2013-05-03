@@ -131,7 +131,6 @@
                                     'face colourface))))))))))
 
 
-;; interactive for testing
 (defun yon-apply-deadlinks ()
   "Checks each line for deadlink replacement."
   (save-excursion
