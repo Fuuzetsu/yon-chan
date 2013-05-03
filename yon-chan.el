@@ -38,7 +38,7 @@
 ;;   "Set local key defs for yon-mode"
 ;;   (define-key yon-mode-map "q" 'quit-window)
 
-(global-set-key (kbd "C-c C-r gl") 'yon-apply-greenstuff)
+(global-set-key (kbd "C-c C-r gl") 'yon-apply-greentext)
 
 ;;; Faces
 
@@ -144,7 +144,7 @@
              (forward-line 1))))
 
 ;; interactive for testing
-(defun yon-apply-greenstuff ()
+(defun yon-apply-greentext ()
   "Checks each line for greentext replacement."
   (interactive)
   (save-excursion
@@ -254,7 +254,7 @@
   (with-current-buffer buffer
     (setq buffer-read-only nil)
     (insert (funcall proc obj))
-    (yon-apply-greenstuff)
+    (yon-apply-greentext)
     (yon-apply-deadlinks)
     (setq buffer-read-only t)))
 
