@@ -96,8 +96,7 @@
 
 (defun yon-get-closing-point (bufstr close)
   (let ((match (string-match close bufstr)))
-    (when match
-      (+ match (length close)))))
+    (+ match (length close))))
 
 (defun yon-get-section (start end)
   (save-excursion
@@ -212,7 +211,7 @@
                  :author    (yon-elem response 'name "Anonymous")
                  :timestamp (yon-elem response 'now)
                  :number    (yon-elem response 'no)
-                 :comment   (yon-elem response 'com)))
+                 :comment   (yon-elem response 'com "")))
 
 (defun yon-build-catalog (response)
   (mapcar 'yon-build-page response))
