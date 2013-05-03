@@ -11,3 +11,4 @@ echo "ECUKES_EMACS = $ECUKES_EMACS"
 echo
 
 exec ./run-tests.sh $TAGS
+exec ./run-unit-tests.sh
