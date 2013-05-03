@@ -126,6 +126,7 @@ Why haven't you joined the 144p master race yet /g/?")))))))
                                  :comment "This is a test")))
     (should (equalp (yon-build-post response) expected))))
 
+
 (ert-deftest test-yon-apply-deadlinks ()
   "Test that deadlinks are properly caught and substituted"
   (let ((input-text "top empty
@@ -143,6 +144,35 @@ end test"))
       (insert input-text)
       (yon-apply-deadlinks)
       (message "%s" (buffer-string))
+      (should (string= result-text (buffer-string))))))
+
+(ert-deftest test-yon-apply-greentext ()
+  "Test that greentext is properly caught and substituted"
+  (let ((input-text "top empty
+<span class=\"quote\">>please go OP</span>
+<span class=\"quote\">>staying</span>
+Long lines are long.
+<span class=\"quote\">>test test test</span>
+more text
+even more text
+<span class=\"quote\">>Multi
+ track
+ greentext!</span>
+<span class=\"quote\">></span>
+end test")
+        (result-text "top empty
+>please go OP
+>staying
+Long lines are long.
+>test test test
+more text
+even more text
+>Multi track greentext!
+>
+end test"))
+    (with-temp-buffer
+      (insert input-text)
+      (yon-apply-greentext)
       (should (string= result-text (buffer-string))))))
 
 ;;; Formatting
