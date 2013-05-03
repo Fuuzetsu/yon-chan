@@ -3,6 +3,8 @@
 cd "$(dirname "$0")"
 
 ECUKES_EMACS=${EMACS:-$(which emacs)}
+TRAVIS="true"
+export TRAVIS
 export ECUKES_EMACS
 
 echo "*** Emacs version ***"
