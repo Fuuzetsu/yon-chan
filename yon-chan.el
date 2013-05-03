@@ -51,22 +51,22 @@
     (((class color)) :foreground "green3"))
   "Basic greentext face for all the implications we can imply.")
 
-(defface yon-chan-poster
+(defface yon-face-post-author
   '((default :weight bold)
     (((class color) (min-colors 16) (background light)) :foreground "purple4")
     (((class color) (min-colors 16) (background dark))  :foreground "purple2")
     (((class color)) :foreground "purple"))
-  "Basic face for the poster name.")
+  "Basic face for the post author.")
 
-(defface yon-chan-topic-name
+(defface yon-face-post-subject
   '((default :weight bold)
     (((class color)) :foreground "brown"))
-  "Basic face for the topic name.")
+  "Basic face for the post subject.")
 
 (defface yon-chan-post-number
   '((default :weight bold)
     (((class color)) :foreground "red3"))
-  "Basic face for the poster number.")
+  "Basic face for the post number.")
 
 (defface yon-chan-deadlink
   '((default :strike-through t)
@@ -213,66 +213,65 @@
                  :number    (yon-elem response 'no)
                  :comment   (yon-elem response 'com)))
 
+(defun yon-build-catalog (response)
+  (mapcar 'yon-build-page response))
+
+(defun yon-build-page (response)
+  (mapcar 'yon-build-post (yon-elem response 'threads)))
+
 ;;; Rendering
 
-(defun yon-render (buffer proc json)
+(defun yon-render (buffer proc obj)
   (with-current-buffer buffer
     (setq buffer-read-only nil)
-    (funcall proc json)
+    (insert (funcall proc obj))
     (yon-apply-greenstuff)
     (yon-apply-deadlinks)
     (setq buffer-read-only t)))
 
-(defun yon-render-board (catalog)
-  (mapc 'yon-render-page catalog))
+(defun yon-render-catalog (catalog)
+  (mapconcat 'yon-render-catalog-page catalog "\n"))
 
-(defun yon-render-page (page)
-  (mapc 'yon-render-op-post (yon-elem page 'threads)))
+(defun yon-render-catalog-page (page)
+  (mapconcat 'yon-format-post page "\n"))
 
-(defun yon-render-thread (thread)
-  (insert "Thread:\n")
-  (mapc 'yon-render-post (yon-elem thread 'posts)))
+;;; Formatting
 
-;; These render functions are gross.
-;; Using some quasiquoting and a function to render a template would be better.
-;; Input:
-;;   `(Subject - ,(yon-elem post 'sub "No subject"))
-;; Possible Output:
-;;   Subject - No Subject
-(defun yon-render-post (post)
-  (yon-insert-header post)
-  (insert (number-to-string (yon-elem post 'no)))
-  (newline)
-  (insert (yon-process-post (yon-elem post 'com "")))
-  (newline)
-  (newline))
+(defun yon-format-post (post)
+  "Returns a formatted string representation of a post"
+  (format "%s\n%s"
+          (yon-format-post-header post)
+          (yon-format-post-comment post)))
 
-(defun yon-render-op-post (post)
-  (yon-insert-header post)
-  (auto-fill-mode t)
-  (insert (yon-process-post (yon-elem post 'com "")))
-  (auto-fill-mode nil)
-  (newline)
-  (newline))
+(defun yon-format-post-header (post)
+  "Returns a formatted string representation of a post header.
+The header consists of the subject, author, timestamp, and post number."
+  (format "%s - %s - %s - %s"
+          (yon-format-post-subject post)
+          (yon-format-post-author post)
+          (yon-format-post-timestamp post)
+          (yon-format-post-number post)))
 
-(defun yon-insert-header (post)
-  (insert
-   (propertize
-    (yon-clean-html-string (yon-elem post 'sub "No subject"))
-    'face 'yon-chan-topic-name))
-  (insert " - ")
-  (insert
-   (propertize
-    (yon-clean-html-string (yon-elem post 'name "No name"))
-    'face 'yon-chan-poster))
-  (insert " - ")
-  (insert (yon-clean-html-string (yon-elem post 'now)))
-  (insert " - ")
-  (insert
-   (propertize
-    (concat "No. "(number-to-string (yon-elem post 'no)))
-    'face 'yon-chan-post-number))
-  (newline))
+(defun yon-format-post-comment (post)
+  (yon-process-post (yon-post-comment post)))
+
+(defun yon-format-post-subject (post)
+  (propertize
+    (yon-clean-html-string (yon-post-subject post))
+    'face 'yon-face-post-subject))
+
+(defun yon-format-post-author (post)
+  (propertize
+    (yon-clean-html-string (yon-post-author post))
+    'face 'yon-face-post-author))
+
+(defun yon-format-post-timestamp (post)
+  (yon-clean-html-string (yon-post-timestamp post)))
+
+(defun yon-format-post-number (post)
+  (propertize
+    (number-to-string (yon-post-number post))
+    'face 'yon-face-post-number))
 
 ;; let's hard code this for now
 (defun yon-browse-g (buffer)
@@ -280,8 +279,8 @@
                 (lexical-let ((yon-buffer buffer))
                   (lambda (status)
                     (yon-render yon-buffer
-                                  'yon-render-board
-                                  (yon-get-and-parse-json))))))
+                                'yon-render-catalog
+                                (yon-build-catalog (yon-get-and-parse-json)))))))
 
 ;;;###autoload
 (defun yon-chan ()

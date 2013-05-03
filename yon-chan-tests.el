@@ -38,7 +38,7 @@ test</span>"))
 
 ;;; Posts
 
-(ert-deftest yon-build-post ()
+(ert-deftest test-yon-build-post ()
   "Test building post objects from deserialized JSON."
   (let ((response '((sub . "Hello world")
                     (name . "Anonymous")
@@ -51,5 +51,65 @@ test</span>"))
                                  :number 9001
                                  :comment "This is a test")))
     (should (equalp (yon-build-post response) expected))))
+
+;;; Formatting
+
+(ert-deftest test-yon-format-post ()
+  "Test formatting post string."
+  (let ((post "a fake post"))
+    (mocker-let ((yon-format-post-header (p)
+                                         ((:input (list post) :output "foo")))
+                 (yon-format-post-comment (p)
+                                          ((:input (list post) :output "bar"))))
+      (should (string= (yon-format-post post) "foo\nbar")))))
+
+(ert-deftest test-yon-format-post-header ()
+  "Test formatting post header string."
+  (let ((post "a fake post"))
+    (mocker-let ((yon-format-post-subject (p)
+                                          ((:input (list post) :output "subject")))
+                 (yon-format-post-author (p)
+                                          ((:input (list post) :output "author")))
+                 (yon-format-post-timestamp (p)
+                                          ((:input (list post) :output "the time")))
+                 (yon-format-post-number (p)
+                                         ((:input (list post) :output 1))))
+      (should (string= (yon-format-post-header post)
+                       "subject - author - the time - 1")))))
+
+(ert-deftest test-yon-format-post-comment ()
+  "Test formatting post comment string."
+  (let ((post (make-yon-post :comment "hello world")))
+    (mocker-let ((yon-process-post (comment)
+                                   ((:input '("hello world") :output "hello world"))))
+      (should (string= (yon-format-post-comment post) "hello world")))))
+
+(ert-deftest test-yon-format-post-subject ()
+  "Test formatting post subject string"
+  (let ((post (make-yon-post :subject "hello")))
+    (mocker-let ((propertize (text property value)
+                             ((:input '("hello" face yon-face-post-subject)
+                                      :output "hello")))
+                 (yon-clean-html-string (html)
+                                        ((:input '("hello") :output "hello"))))
+      (should (string= (yon-format-post-subject post) "hello")))))
+
+(ert-deftest test-yon-format-post-author ()
+  "Test formatting post subject string"
+  (let ((post (make-yon-post :author "Anonymous")))
+    (mocker-let ((propertize (text property value)
+                             ((:input '("Anonymous" face yon-face-post-author)
+                                      :output "Anonymous")))
+                 (yon-clean-html-string (html)
+                                        ((:input '("Anonymous") :output "Anonymous"))))
+      (should (string= (yon-format-post-author post) "Anonymous")))))
+
+(ert-deftest test-yon-format-post-number ()
+  "Test formatting post number string"
+  (let ((post (make-yon-post :number 1)))
+    (mocker-let ((propertize (text property value)
+                             ((:input '("1" face yon-face-post-number)
+                                      :output "1"))))
+      (should (string= (yon-format-post-number post) "1")))))
 
 (provide 'yon-chan-tests)
