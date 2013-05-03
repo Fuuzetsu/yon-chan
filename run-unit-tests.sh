@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 EMACS=${ECUKES_EMACS:-emacs}
 
 if [[ "$TRAVIS" == "true" ]]; then

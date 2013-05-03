@@ -1,4 +1,4 @@
-#!/bin/sh -e
+#!/usr/bin/env bash
 ECUKES=$(find elpa/ecukes-*/ecukes | tail -1)
 
 carton exec "$ECUKES" "$@"
