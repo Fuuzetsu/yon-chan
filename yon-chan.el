@@ -206,7 +206,7 @@
   filename replyto sticky closed time trip id capcode country
   country_name email ext fsize md5 image_w image_h thumbnail_w thumbnail_h
   filedeleted spoiler custom_spoiler omitted_posts omitted_images replies
-  images bumplimit imagelimit)
+  images bumplimit imagelimit new_filename)
 
 (defun yon-build-post (response)
   "Builds a post object from deserialized JSON response."
@@ -219,6 +219,7 @@
                  :replyto        (yon-elem response 'resto) ;; 0 is OP
                  :sticky         (yon-elem response 'sticky)
                  :closed         (yon-elem response 'closed)
+                 :new_filename   (yon-elem response 'tim)
                  :time           (yon-elem response 'time)
                  :trip           (yon-elem response 'trip)
                  :id             (yon-elem response 'id)
