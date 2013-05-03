@@ -10,4 +10,9 @@ echo "ECUKES_EMACS = $ECUKES_EMACS"
 "$ECUKES_EMACS" --version
 echo
 
-exec ./run-tests.sh $TAGS && ./run-unit-tests.sh
+./run-tests.sh $TAGS
+INTEGRATION=$?
+$EMACS -batch -l ert -l yon-chan.el -l yon-chan-tests.el -f ert-run-tests-batch-and-exit
+UNIT=$?
+
+exit $INTEGRATION && $UNIT
