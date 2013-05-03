@@ -37,8 +37,9 @@ test</span>"))
   (should (string= (yon-elem '() 'foo) nil))
   (should (string= (yon-elem '() 'foo "bar") "bar")))
 
+
 (ert-deftest test-yon-build-catalog ()
-  "Test that a sample catalog page is parsed properly."
+  "Test that a simple catalog page is parsed properly."
   (with-temp-buffer
     (insert-file-contents "features/stubs/small-catalog.json")
     (let* ((catalog (yon-build-catalog (yon-parse-json (buffer-string))))
@@ -89,6 +90,25 @@ test</span>"))
                               (now . "05/03/13(Fri)15:11")
                               (no . 33510342)))))
            (should (equalp catalog expected))))))
+
+;; This test's formatting is weird to ensure all whitespace is preserved
+(ert-deftest test-yon-render-catalog ()
+  "Test that a simple catalog page is rendered properly."
+  (with-temp-buffer
+    (insert-file-contents "features/stubs/small-catalog.json")
+    (let* ((catalog (yon-build-catalog (yon-parse-json (buffer-string)))))
+      (with-temp-buffer
+        (insert (yon-render-catalog catalog))
+        (should (string= (buffer-string)
+                         (concat "No subject - Anonymous - 05/03/13(Fri)10:16 - 33505434
+Anyone still using their Raspberry Pi or did you get bored? "
+                                 "
+
+What have you guys done with yours?
+No subject - Anonymous - 05/03/13(Fri)06:23 - 33502527
+Why haven't you joined the 144p master race yet /g/?")))))))
+
+
 
 ;;; Posts
 
