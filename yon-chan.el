@@ -168,9 +168,8 @@
   (replace-regexp-in-string "\n" "" body))
 
 (defun yon-process-post (body)
-  (when body
-    (let* ((cleaned (yon-clean-html-string body)))
-      cleaned)))
+  (let* ((cleaned (yon-clean-html-string body)))
+    cleaned))
 
 ;;; 4chan JSON API
 
