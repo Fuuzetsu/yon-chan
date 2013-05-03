@@ -88,7 +88,7 @@ test</span>"))
                               (name . "25 and")
                               (now . "05/03/13(Fri)15:11")
                               (no . 33510342)))))
-           (should (equalp catalog expected)))))
+           (should (equalp catalog expected))))))
 
 ;;; Posts
 
