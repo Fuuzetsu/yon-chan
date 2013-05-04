@@ -389,10 +389,17 @@ The header consists of the subject, author, timestamp, and post number."
   (yon-clean-html-string (yon-post-timestamp post)))
 
 (defun yon-format-post-number (post)
-  "Returns a propertized number string."
-  (propertize
-   (number-to-string (yon-post-number post))
-   'face 'yon-face-post-number))
+  "Returns the post number. Clickable if it's a thread OP."
+  (lexical-let ((op t)  ;; Change this to the :replyto post property after merge
+                (kmap (make-sparse-keymap))
+                (board (with-current-buffer (buffer-name)
+                         (when (boundp 'yon-current-board)
+                             yon-current-board)))
+                (post-number (number-to-string (yon-post-number post))))
+    (if (and op board)
+        (concat "<a href=\"" post-number "#p" post-number "\" class=\"quotelink\">" post-number "</a>")
+      (propertize
+       post-number 'face 'yon-face-post-number))))
 
 ;; let's hard code this for now
 (defun yon-browse-board-catalog (buffer board)
