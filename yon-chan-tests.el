@@ -37,6 +37,79 @@ test</span>"))
   (should (string= (yon-elem '() 'foo) nil))
   (should (string= (yon-elem '() 'foo "bar") "bar")))
 
+
+(ert-deftest test-yon-build-catalog ()
+  "Test that a simple catalog page is parsed properly."
+  (with-temp-buffer
+    (insert-file-contents "features/stubs/small-catalog.json")
+    (let* ((catalog (yon-build-catalog (yon-parse-json (buffer-string))))
+           (expected (list (yon-build-post
+                            '((images . 4)
+                              (replies . 43)
+                              (trip . "!!MJ4VbGu9hJd")
+                              (imagelimit . 0)
+                              (bumplimit . 0)
+                              (resto . 0)
+                              (fsize . 274881)
+                              (md5 . "37f6aLmlX3BiAteLJzmXwA==")
+                              (time . 1367611690.0)
+                              (tim . 1367611690801.0)
+                              (tn_h . 140)
+                              (tn_w . 250)
+                              (h . 1080)
+                              (w . 1920)
+                              (ext . ".jpg")
+                              (filename . "DSC00969")
+                              (com . "This is a light pole outside of my house. What do you think it&#039;s for?")
+                              (name . "OP")
+                              (now . "05/03/13(Fri)16:08")
+                              (no . 33511354))
+                            )
+
+                           (yon-build-post
+                            '((images . 41)
+                              (replies . 113)
+                              (trip . "!VIRGIN/FJM")
+                              (imagelimit . 0)
+                              (bumplimit . 0)
+                              (resto . 0)
+                              (fsize . 692993)
+                              (md5 . "ugTvIjLyKIEXfzh8z1EBWw==")
+                              (time . 1367608288.0)
+                              (tim . 1367608288151.0)
+                              (tn_h . 140)
+                              (tn_w . 250)
+                              (h . 768)
+                              (w . 1366)
+                              (ext . ".png")
+                              (filename . "destap")
+                              (com . "Refreshed page 8366 times, saw no desktop threads.  Posting a desktop thread using start_desktop_thread.sh")
+                              (sub . "desktop thread")
+                              (email . "neko")
+                              (name . "25 and")
+                              (now . "05/03/13(Fri)15:11")
+                              (no . 33510342)))))
+           (should (equalp catalog expected))))))
+
+;; This test's formatting is weird to ensure all whitespace is preserved
+(ert-deftest test-yon-render-catalog ()
+  "Test that a simple catalog page is rendered properly."
+  (with-temp-buffer
+    (insert-file-contents "features/stubs/small-catalog.json")
+    (let* ((catalog (yon-build-catalog (yon-parse-json (buffer-string)))))
+      (with-temp-buffer
+        (insert (yon-render-catalog catalog))
+        (should (string= (buffer-string)
+                         (concat "No subject - Anonymous - 05/03/13(Fri)10:16 - 33505434
+Anyone still using their Raspberry Pi or did you get bored? "
+                                 "
+
+What have you guys done with yours?
+No subject - Anonymous - 05/03/13(Fri)06:23 - 33502527
+Why haven't you joined the 144p master race yet /g/?")))))))
+
+
+
 ;;; Posts
 
 (ert-deftest test-yon-build-post ()
@@ -52,6 +125,54 @@ test</span>"))
                                  :number 9001
                                  :comment "This is a test")))
     (should (equalp (yon-build-post response) expected))))
+
+
+(ert-deftest test-yon-apply-deadlinks ()
+  "Test that deadlinks are properly caught and substituted"
+  (let ((input-text "top empty
+Midline deadlink <span class=\"deadlink\">>>>/g/123456</span> endline
+more text
+midbroken <span class=\"deadlink\">>>>/g/6425
+7533</span> deadlink
+end test")
+        (result-text "top empty
+Midline deadlink >>>/g/123456 endline
+more text
+midbroken >>>/g/64257533 deadlink
+end test"))
+    (with-temp-buffer
+      (insert input-text)
+      (yon-apply-deadlinks)
+      (should (string= result-text (buffer-string))))))
+
+(ert-deftest test-yon-apply-greentext ()
+  "Test that greentext is properly caught and substituted"
+  (let ((input-text "top empty
+<span class=\"quote\">>please go OP</span>
+<span class=\"quote\">>staying</span>
+Long lines are long.
+<span class=\"quote\">>test test test</span>
+more text
+even more text
+<span class=\"quote\">>Multi
+ track
+ greentext!</span>
+<span class=\"quote\">></span>
+end test")
+        (result-text "top empty
+>please go OP
+>staying
+Long lines are long.
+>test test test
+more text
+even more text
+>Multi track greentext!
+>
+end test"))
+    (with-temp-buffer
+      (insert input-text)
+      (yon-apply-greentext)
+      (should (string= result-text (buffer-string))))))
 
 ;;; Formatting
 
