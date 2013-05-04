@@ -334,7 +334,8 @@
     (setq buffer-read-only nil)
     (insert (funcall proc obj))
     (yon-apply-faces)
-    (setq buffer-read-only t)))
+    (setq buffer-read-only t)
+    (goto-char (point-min))))
 
 (defun yon-render-catalog (catalog)
   (mapconcat 'yon-render-catalog-page catalog "\n"))
