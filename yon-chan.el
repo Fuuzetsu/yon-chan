@@ -212,6 +212,9 @@
                  :number    (yon-elem response 'no)
                  :comment   (yon-elem response 'com "")))
 
+(defun yon-build-thread (response)
+  (mapcar 'yon-build-post (yon-elem response 'posts)))
+
 (defun yon-build-catalog (response)
   (mapcar 'yon-build-page response))
 
@@ -233,6 +236,14 @@
 
 (defun yon-render-catalog-page (page)
   (mapconcat 'yon-format-post page "\n"))
+
+(defun yon-render-thread (posts)
+  (let ((op (car posts))
+        (replies (cdr posts)))
+    (concat (yon-format-post op) "\n"
+            (mapconcat (lambda (x) (replace-regexp-in-string ;; for now
+                                    "^" "    "
+                                    (yon-format-post x))) replies "\n"))))
 
 ;;; Formatting
 
@@ -285,6 +296,15 @@ The header consists of the subject, author, timestamp, and post number."
                     (yon-render yon-buffer
                                 'yon-render-catalog
                                 (yon-build-catalog (yon-get-and-parse-json)))))))
+
+(defun yon-browse-thread (buffer board thread-number)
+  (url-retrieve
+   (concat "http://api.4chan.org/" board "/res/" thread-number ".json")
+   (lexical-let ((yon-buffer buffer))
+     (lambda (status)
+       (yon-render yon-buffer
+                   'yon-render-thread
+                   (yon-build-thread (yon-get-and-parse-json)))))))
 
 ;;;###autoload
 (defun yon-chan ()
