@@ -412,7 +412,7 @@ The header consists of the subject, author, timestamp, and post number."
 
 (defun yon-format-post-number (post)
   "Returns the post number. Clickable if it's a thread OP."
-  (lexical-let ((op t)  ;; Change this to the :replyto post property after merge
+  (lexical-let ((op (equal 0 (yon-post-replyto post)))
                 (kmap (make-sparse-keymap))
                 (board (with-current-buffer (buffer-name)
                          (when (boundp 'yon-current-board)
@@ -434,7 +434,6 @@ The header consists of the subject, author, timestamp, and post number."
           (buffer-string))
       (propertize post-number 'face 'yon-face-post-number))))
 
-;; let's hard code this for now
 (defun yon-browse-board-catalog (buffer board)
   (url-retrieve (concat "http://api.4chan.org/" board "/catalog.json")
                 (lexical-let ((yon-buffer buffer))
