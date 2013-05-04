@@ -175,8 +175,8 @@
                                     (with-temp-buffer
                                       (insert (car link))
                                       (goto-char (point-min))
-                                      (zap-to-char 2 (string-to-char "/")) ;; board
-                                      (delete-char (length "/res/"))
+                                      (zap-to-char 2 (string-to-char "/"))
+                                      (erase-buffer)
                                       (yank)
                                       (goto-char (point-min))
                                       (delete-char 1)
@@ -198,7 +198,14 @@
                                       (delete-char 1)
                                       (buffer-string))))
                       (let ((kmap (make-sparse-keymap)))
-                        (define-key kmap [mouse-2] (lambda () (message "TODO browse thread")))
+                        (define-key kmap [mouse-2]
+                          (lambda ()
+                            (interactive)
+                            (yon-browse-thread
+                             (switch-to-buffer-other-window
+                              (generate-new-buffer
+                               (concat "*yon-chan-/" board "/-" thread)))
+                             board thread)))
                         (insert-text-button (yon-strip-newlines (cadr split-cont))
                                             'face 'yon-face-post-number
                                             'keymap kmap))))
@@ -208,12 +215,21 @@
                                  (insert (cadr link))
                                  (goto-char (point-min))
                                  (delete-char 1)
-                                 (buffer-string))))
-                  (let ((kmap (make-sparse-keymap)))
-                    (define-key kmap [mouse-2] (lambda () (message "TODO browse thread")))
-                    (insert-text-button (yon-strip-newlines (cadr split-cont))
-                                        'face 'yon-face-post-number
-                                        'keymap kmap)))))))))))
+                                 (buffer-string)))
+                              (kmap (make-sparse-keymap))
+                              (board (with-current-buffer (buffer-name)
+                                       yon-current-board)))
+                  (define-key kmap [mouse-2]
+                    (lambda ()
+                      (interactive)
+                      (yon-browse-thread
+                       (switch-to-buffer-other-window
+                        (generate-new-buffer
+                         (concat "*yon-chan-/" board "/-" thread)))
+                       board thread)))
+                  (insert-text-button (yon-strip-newlines (cadr split-cont))
+                                      'face 'yon-face-post-number
+                                      'keymap kmap))))))))))
 ;; interactive for testing
 (defun yon-apply-deadlinks ()
   "Checks each line for deadlink replacement."
@@ -247,8 +263,7 @@
   "Least elegant function that will replace quotes with greentext."
   (interactive)
   (let ((op "<span class=\"quote\">")
-        (ed "</span>")))
-  )
+        (ed "</span>"))))
 
 (defun yon-strip-newlines (body)
   (replace-regexp-in-string "\n" "" body))
@@ -391,6 +406,8 @@ The header consists of the subject, author, timestamp, and post number."
   (url-retrieve
    (concat "http://api.4chan.org/" board "/res/" thread-number ".json")
    (lexical-let ((yon-buffer buffer))
+     (setq yon-current-board board)
+     (with-current-buffer buffer (make-local-variable 'yon-current-board))
      (lambda (status)
        (yon-render yon-buffer
                    'yon-render-thread

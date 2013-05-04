@@ -58,12 +58,15 @@ test</span>"))
   (let ((orig "<a href=\"579850#p579850\" class=\"quotelink\">>>579850</a>
 meanwhile, test
 <a href=\"/g/res/33526840#p33526840\" class=\"quotelink\">>>>/g/3352
-g6840</a>")
+6840</a>")
         (expected ">>579850
 meanwhile, test
 >>>/g/33526840"))
     (should (string= (with-temp-buffer
                        (insert orig)
+                       (setq yon-current-board "q") ;; assume we're on /q/
+                       (with-current-buffer (buffer-name)
+                         (make-local-variable 'yon-current-board))
                        (yon-apply-quotelinks)
                        (buffer-string))
                      expected))))
