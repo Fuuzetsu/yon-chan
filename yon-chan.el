@@ -421,9 +421,8 @@ The header consists of the subject, author, timestamp, and post number."
 (defun yon-browse-board-catalog (buffer board)
   (url-retrieve (concat "http://api.4chan.org/" board "/catalog.json")
                 (lexical-let ((yon-buffer buffer))
-                  (setq yon-current-board board)
                   (with-current-buffer yon-buffer
-                    (make-local-variable 'yon-current-board))
+                    (set (make-local-variable 'yon-current-board) board))
                   (lambda (status)
                     (yon-render yon-buffer
                                 'yon-render-catalog
@@ -433,8 +432,8 @@ The header consists of the subject, author, timestamp, and post number."
   (url-retrieve
    (concat "http://api.4chan.org/" board "/res/" thread-number ".json")
    (lexical-let ((yon-buffer buffer))
-     (setq yon-current-board board)
-     (with-current-buffer buffer (make-local-variable 'yon-current-board))
+     (with-current-buffer buffer
+       (set (make-local-variable 'yon-current-board) board))
      (lambda (status)
        (yon-render yon-buffer
                    'yon-render-thread

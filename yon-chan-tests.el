@@ -64,9 +64,8 @@ meanwhile, test
 >>>/g/33526840"))
     (should (string= (with-temp-buffer
                        (insert orig)
-                       (setq yon-current-board "q") ;; assume we're on /q/
                        (with-current-buffer (buffer-name)
-                         (make-local-variable 'yon-current-board))
+                         (set (make-local-variable 'yon-current-board) "q"))
                        (yon-apply-quotelinks)
                        (buffer-string))
                      expected))))
@@ -138,7 +137,8 @@ meanwhile, test
 (ert-deftest test-yon-format-post-number-op ()
   "Test formatting post number string"
   (let ((post (make-yon-post :number 1)))
-    (setq yon-current-board "q")
+    (with-current-buffer (current-buffer)
+      (set (make-local-variable 'yon-current-board) "q"))
     (should (string= (yon-format-post-number post) "1"))))
 
 (provide 'yon-chan-tests)
