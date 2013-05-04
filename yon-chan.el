@@ -68,6 +68,11 @@
     (((class color)) :foreground "red3"))
   "Basic face for the post number.")
 
+(defface yon-face-post-number-link
+  '((default :weight bold :underline)
+    (((class color)) :foreground "red3"))
+  "Basic face for the post number.")
+
 (defface yon-chan-deadlink
   '((default :strike-through t)
     (((class color)) :foreground "red2"))
@@ -207,7 +212,7 @@
                                (concat "*yon-chan-/" board "/-" thread)))
                              board thread)))
                         (insert-text-button (yon-strip-newlines (cadr split-cont))
-                                            'face 'yon-face-post-number
+                                            'face 'yon-face-post-number-link
                                             'keymap kmap))))
                 (lexical-let ((thread (car link))
                               (post
@@ -228,7 +233,7 @@
                          (concat "*yon-chan-/" board "/-" thread)))
                        board thread)))
                   (insert-text-button (yon-strip-newlines (cadr split-cont))
-                                      'face 'yon-face-post-number
+                                      'face 'yon-face-post-number-link
                                       'keymap kmap))))))))))
 ;; interactive for testing
 (defun yon-apply-deadlinks ()
