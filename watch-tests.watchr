@@ -7,14 +7,18 @@ end
 
 def run_all_tests
   system('clear')
-  result = run "./run-tests.sh"
+  result = run "./run-tests.sh --script"
+  result2 = run "./run-unit-tests.sh"
   puts result
+  puts result2
 end
 
 def run_test(file)
   system('clear')
-  result = run "./run-tests.sh #{file} --verbose"
+  result = run "./run-tests.sh --script #{file} --verbose"
+  result2 = run "./run-unit-tests.sh"
   puts result
+  puts result2
 end
 
 run_all_tests

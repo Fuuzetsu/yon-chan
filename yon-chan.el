@@ -38,9 +38,6 @@
 ;;   "Set local key defs for yon-mode"
 ;;   (define-key yon-mode-map "q" 'quit-window)
 
-(global-set-key (kbd "C-c C-r gd") 'yon-apply-deadlinks)
-(global-set-key (kbd "C-c C-r gl") 'yon-apply-greenstuff)
-
 ;;; Faces
 
 (defface yon-chan-greentext
@@ -138,6 +135,7 @@
                 (insert (propertize cont
                                     'face colourface))))))))))
 
+
 (defun yon-make-quote-buttons ()
   (let* ((start (string-match "<a href=\".*?\" class=\"quotelink\">" (yon-get-line-content)))
          (op "<a href\"")
@@ -225,10 +223,9 @@
                   (insert-text-button (yon-strip-newlines (cadr split-cont))
                                       'face 'yon-face-post-number-link
                                       'keymap kmap))))))))))
-;; interactive for testing
+
 (defun yon-apply-deadlinks ()
   "Checks each line for deadlink replacement."
-  (interactive)
   (save-excursion
     (goto-char (point-min))
     (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
@@ -236,10 +233,8 @@
                               'yon-chan-deadlink t)
              (forward-line 1))))
 
-;; interactive for testing
-(defun yon-apply-greenstuff ()
+(defun yon-apply-greentext ()
   "Checks each line for greentext replacement."
-  (interactive)
   (save-excursion
     (goto-char (point-min))
     (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
@@ -298,15 +293,47 @@
 ;; The atoms of 4chan.
 
 (cl-defstruct yon-post
-  subject author timestamp number comment)
+  subject author timestamp number comment
+  filename replyto sticky closed time trip id capcode country
+  country_name email ext fsize md5 image_w image_h thumbnail_w thumbnail_h
+  filedeleted spoiler custom_spoiler omitted_posts omitted_images replies
+  images bumplimit imagelimit new_filename)
 
 (defun yon-build-post (response)
   "Builds a post object from deserialized JSON response."
-  (make-yon-post :subject   (yon-elem response 'sub "No subject")
-                 :author    (yon-elem response 'name "Anonymous")
-                 :timestamp (yon-elem response 'now)
-                 :number    (yon-elem response 'no)
-                 :comment   (yon-elem response 'com "")))
+  (make-yon-post :subject        (yon-elem response 'sub "No subject")
+                 :author         (yon-elem response 'name "Anonymous")
+                 :timestamp      (yon-elem response 'now)
+                 :number         (yon-elem response 'no)
+                 :comment        (yon-elem response 'com "")
+                 :filename       (yon-elem response 'filename)
+                 :replyto        (yon-elem response 'resto) ;; 0 is OP
+                 :sticky         (yon-elem response 'sticky)
+                 :closed         (yon-elem response 'closed)
+                 :new_filename   (yon-elem response 'tim)
+                 :time           (yon-elem response 'time)
+                 :trip           (yon-elem response 'trip)
+                 :id             (yon-elem response 'id)
+                 :capcode        (yon-elem response 'capcode)
+                 :country        (yon-elem response 'country)
+                 :country_name   (yon-elem response 'country_name)
+                 :email          (yon-elem response 'email)
+                 :ext            (yon-elem response 'ext)
+                 :fsize          (yon-elem response 'fsize)
+                 :md5            (yon-elem response 'md5)
+                 :image_w        (yon-elem response 'w)
+                 :image_h        (yon-elem response 'h)
+                 :thumbnail_w    (yon-elem response 'tn_w)
+                 :thumbnail_h    (yon-elem response 'tn_h)
+                 :filedeleted    (yon-elem response 'filedeleted)
+                 :spoiler        (yon-elem response 'spoiler)
+                 :custom_spoiler (yon-elem response 'custom_spoiler)
+                 :omitted_posts  (yon-elem response 'omitted_posts)
+                 :omitted_images (yon-elem response 'omitted_images)
+                 :replies        (yon-elem response 'replies)
+                 :images         (yon-elem response 'images)
+                 :bumplimit      (yon-elem response 'bumplimit)
+                 :imagelimit     (yon-elem response 'imagelimit)))
 
 (defun yon-build-thread (response)
   (mapcar 'yon-build-post (yon-elem response 'posts)))

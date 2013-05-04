@@ -1,0 +1,282 @@
+{
+    "posts": [
+        {
+            "no": 33504334,
+            "now": "05/03/13(Fri)08:54",
+            "name": "Anonymous",
+            "sub": "Daily Programming Thread",
+            "com": "-- TUTORIALS --<br>http://programming-motherfucker.com<wbr>/become.html<br>http://books.installgentoo.com/<br>http://books.gentoomen.org/<br>http://appsapps.com/ebooks/<br><br>-- CHALLENGES --<br>http://www.codechef.com/<br>http://code.google.com/codejam/cont<wbr>ests.html<br>http://www.pythonchallenge.com/<br>http://projecteuler.net/<br>https://facebook.interviewstreet.co<wbr>m/recruit/challenges<br><br>-- ONLINE COMPILERS --<br>http://repl.it/<br>http://gcc.godbolt.org/<br>http://liveworkspace.org/<br>http://rise4fun.com/vcpp<br>http://stacked-crooked.com/<br>http://ideone.com/<br>https://compilr.com/<br>http://www.onlinecompiler.net/<br>http://codepad.org/<br>http://compileonline.com/<br>http://cmpe150-1.cmpe.boun.edu.tr/o<wbr>nlineCompiler/parts/<br>http://coderun.com/<br>http://closure-compiler.appspot.com<wbr>/home<br>http://shiftedit.net/<br><br>Bot: https://twitter.com/DPTBot<br><br>What are you working on /g/?",
+            "filename": "1367436628597",
+            "ext": ".png",
+            "w": 900,
+            "h": 800,
+            "tn_w": 250,
+            "tn_h": 222,
+            "tim": 1367585698200,
+            "time": 1367585698,
+            "md5": "/QJy2TKkYsoftVE/hyLlQw==",
+            "fsize": 754283,
+            "resto": 0,
+            "bumplimit": 0,
+            "imagelimit": 0,
+            "replies": 27,
+            "images": 4
+        },
+        {
+            "no": 33504384,
+            "now": "05/03/13(Fri)08:58",
+            "name": "Anonymous",
+            "com": "What a shitty, disinfo-filled manifesto.",
+            "time": 1367585930,
+            "resto": 33504334
+        },
+        {
+            "no": 33504413,
+            "now": "05/03/13(Fri)09:00",
+            "name": "Anonymous",
+            "com": "Scheme VS Common Lisp?",
+            "filename": "computer-geek-alignment-chart",
+            "ext": ".jpg",
+            "w": 400,
+            "h": 400,
+            "tn_w": 125,
+            "tn_h": 125,
+            "tim": 1367586058830,
+            "time": 1367586058,
+            "md5": "cs1lsfIYF8Ql0hXPUYpQ8Q==",
+            "fsize": 159680,
+            "resto": 33504334
+        },
+        {
+            "no": 33504428,
+            "now": "05/03/13(Fri)09:02",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33504384\" class=\"quotelink\">&gt;&gt;33504384</a><br>which part are you referring to?",
+            "time": 1367586122,
+            "resto": 33504334
+        },
+        {
+            "no": 33504530,
+            "now": "05/03/13(Fri)09:08",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33504413\" class=\"quotelink\">&gt;&gt;33504413</a><br>you mixed  up stallman and torvalds",
+            "time": 1367586539,
+            "resto": 33504334
+        },
+        {
+            "no": 33504561,
+            "now": "05/03/13(Fri)09:10",
+            "name": "Marisa Kirisame",
+            "email": "kinoko",
+            "com": "<a href=\"33504334#p33504384\" class=\"quotelink\">&gt;&gt;33504384</a><br>I guess you don&#039;t know Zed Shaw.",
+            "time": 1367586630,
+            "resto": 33504334,
+            "trip": "!iwhatLiaJo"
+        },
+        {
+            "no": 33504571,
+            "now": "05/03/13(Fri)09:11",
+            "name": "Anonymous",
+            "com": "How do I use these:<br>http://www.useragentstring.com/page<wbr>s/Safari/<br>To block all iDevices from accessing my site?",
+            "time": 1367586679,
+            "resto": 33504334
+        },
+        {
+            "no": 33504607,
+            "now": "05/03/13(Fri)09:13",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33504413\" class=\"quotelink\">&gt;&gt;33504413</a><br>Scheme is smaller and more elegant, CL is bigger and more practical.<br><br>Scheme would be the better choice if you&#039;re just wanting to make small personal utilities, or if you wanted an embeddable language, but I&#039;d use CL for full-sized applications.",
+            "time": 1367586819,
+            "resto": 33504334
+        },
+        {
+            "no": 33504611,
+            "now": "05/03/13(Fri)09:13",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33504334\" class=\"quotelink\">&gt;&gt;33504334</a><br><span class=\"quote\">&gt;that picture</span><br><br>0/10 fuck the hell off",
+            "time": 1367586836,
+            "resto": 33504334
+        },
+        {
+            "no": 33504667,
+            "now": "05/03/13(Fri)09:17",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33504611\" class=\"quotelink\">&gt;&gt;33504611</a><br>How is your first day on 4chan going, little guy?",
+            "time": 1367587055,
+            "resto": 33504334
+        },
+        {
+            "no": 33504733,
+            "now": "05/03/13(Fri)09:21",
+            "name": "Anonymous",
+            "email": "sage",
+            "com": "<span class=\"deadlink\">&gt;&gt;33504626</span><br>american and russian jews, steve, linus, bill, jimmy?, richard, steve, eugene ,steve",
+            "time": 1367587301,
+            "resto": 33504334
+        },
+        {
+            "no": 33504883,
+            "now": "05/03/13(Fri)09:33",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33504571\" class=\"quotelink\">&gt;&gt;33504571</a><br>IDK if there&#039;s a way to set it up from like apache configuration, but you could have your pages loaded from some sort of script rather than directly loading the static pages. Then the script could read and check the headers for the useragent before sending anything.<br><br>Safari (at least the desktop one) has a built in way to change the useragent though, and it&#039;s generally dead simple to change/not send it with every browser.<br><br>Plus you kind of end up looking as dumb as that &quot;how do I code my programs to not work in Wine&quot; guy.",
+            "time": 1367588007,
+            "resto": 33504334
+        },
+        {
+            "no": 33504920,
+            "now": "05/03/13(Fri)09:36",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33504883\" class=\"quotelink\">&gt;&gt;33504883</a><br>I have Hiawatha.<br><br>All I want is to block all iDevices. Perhaps useragents aren&#039;t the answer then?",
+            "time": 1367588205,
+            "resto": 33504334
+        },
+        {
+            "no": 33504979,
+            "now": "05/03/13(Fri)09:42",
+            "name": "Anonymous",
+            "com": "MCEdit sucks, so I want to make a new Minecraft editor. What language should I use?",
+            "time": 1367588549,
+            "resto": 33504334
+        },
+        {
+            "no": 33504988,
+            "now": "05/03/13(Fri)09:43",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33504979\" class=\"quotelink\">&gt;&gt;33504979</a><br>Lisp",
+            "time": 1367588607,
+            "resto": 33504334
+        },
+        {
+            "no": 33505089,
+            "now": "05/03/13(Fri)09:52",
+            "name": "OOP retard",
+            "com": "here&#039;s another weird one<br><pre class=\"prettyprint\">if ( (*it)-&gt;getStatus() == &quot;starved&quot; )<br>                    {//checks if the animal had starved at the end of its day cycle<br>                    cout &lt;&lt; &quot;the &quot; &lt;&lt; (*it)-&gt;getName() &lt;&lt; &quot; has died...&quot; &lt;&lt; endl &lt;&lt; endl;<br>                    delete *it;<br>                    Animal_list.erase(*it);<br>                    }<br></pre><br><br><br>why is the .erase(*it) failing with<br><span class=\"quote\">&gt;Error    3    error C2664: &#039;std::_List_iterator&lt;_Mylist&gt; std::list&lt;_Ty&gt;::erase(std::_List_co<wbr>nst_iterator&lt;_Mylist&gt;)&#039; : cannot convert parameter 1 from &#039;Animal *&#039; to &#039;std::_List_const_iterator&lt;_Mylist&gt;<wbr>&#039;</span><br><br>do i need to explicitly make the iterator a const with<br><span class=\"quote\">&gt;std::list&lt;Animal*&gt;::const_iterator<wbr> it = Animal_list.begin();</span>",
+            "time": 1367589143,
+            "resto": 33504334
+        },
+        {
+            "no": 33505170,
+            "now": "05/03/13(Fri)09:57",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33504920\" class=\"quotelink\">&gt;&gt;33504920</a><br>I&#039;d say user agent is your only bet. Or make<br>access to your site dependent on Flash lol.<br><br>I&#039;m certain every major web server supports CGI scripting so I didn&#039;t mean to imply only Apache will work.<br><br><pre class=\"prettyprint\">uses dos, htmlutils, sysutils;<br>var<br>    user_agent  : string;<br>    page        : string;<br>    deny_access : boolean;<br>    ref         : text;<br>    ch          : char;<br>    query       : thttpquery;<br>    pair        : thttpquerypair;<br>begin<br>    writeln(&#039;Content-Type: text/html&#039;);<br>    writeln;<br><br>    query := getquery(getenv(&#039;QUERY_STRING&#039;));<br><br>    page := &#039;&#039;;<br><br>    for pair in query do case pair[0] of<br>        &#039;page&#039; : page := pair[1]<br>    end;<br><br>    user_agent := upcase(getenv(&#039;HTTP_USER_AGENT&#039;));<br><br>    deny_access := (pos(&#039;IPHONE&#039;, user_agent) &gt; 0) or<br>        (pos(&#039;IPOD&#039;, user_agent) &gt; 0) or<br>        (pos(&#039;IPAD&#039;, user_agent) &gt; 0);<br>    <br>    writeln(&#039;&lt;p&gt;Your User Agent string is: &#039;, user_agent, &#039;&lt;/p&gt;&#039;);<br><br>    if deny_access then<br>    begin<br>        writeln(&#039;&lt;h1&gt;&#039;);<br>        writeln(&#039;Why are you using such a shitty device?&#039;);<br>        writeln(&#039;&lt;/h1&gt;&#039;)<br>    end<br>    else if page = &#039;&#039; then<br>    begin<br>        writeln(&#039;&lt;h1&gt;&#039;);<br>        writeln(&#039;You seem ok, but you didn&#039;&#039;t specify page!&#039;);<br>        writeln(&#039;&lt;/h1&gt;&#039;)<br>    end<br>    else if fileexists(page) then<br>    begin<br>        assign(ref, page);<br>        reset(ref);<br>        repeat<br>            read(ref, ch);<br>            write(ch)<br>        until eof(ref);<br>        close(ref)<br>    end<br>    else begin<br>        writeln(&#039;&lt;h1&gt;&#039;);<br>        writeln(&#039;You seem ok, but that page doesn&#039;&#039;t exist!&#039;);<br>        writeln(&#039;&lt;/h1&gt;&#039;)<br>    end<br>end.</pre><br><br>http://kibj.nprog.ru/debug/content.<wbr>cgi?page=test.htm<br><br>This script looks for &quot;iphone&quot;, &quot;ipod&quot;, or &quot;ipad&quot; in the user agent, if it find it it blocks them, otherwise it outputs the contents of the page they want (if it exists). And the directory denies direct access to test.htm too, so they can also see it through the content.cgi script.<br><br>You could also get more specific with the agent strings:<br>http://www.enterpriseios.com/wiki/C<wbr>omplete_List_of_iOS_User_Agent_Stri<wbr>ngs",
+            "time": 1367589457,
+            "resto": 33504334
+        },
+        {
+            "no": 33505230,
+            "now": "05/03/13(Fri)10:01",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33505170\" class=\"quotelink\">&gt;&gt;33505170</a>",
+            "filename": "так ке",
+            "ext": ".png",
+            "w": 1304,
+            "h": 445,
+            "tn_w": 125,
+            "tn_h": 42,
+            "tim": 1367589717826,
+            "time": 1367589717,
+            "md5": "3DN+2JLoGLNpBnDgo6Nl0g==",
+            "fsize": 243442,
+            "resto": 33504334
+        },
+        {
+            "no": 33505290,
+            "now": "05/03/13(Fri)10:06",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33505089\" class=\"quotelink\">&gt;&gt;33505089</a><br>Doesn&#039;t list.erase take an iterator type? so Animal_list.erase(it)",
+            "time": 1367589984,
+            "resto": 33504334
+        },
+        {
+            "no": 33505302,
+            "now": "05/03/13(Fri)10:07",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33505230\" class=\"quotelink\">&gt;&gt;33505230</a><br>ide ?",
+            "time": 1367590046,
+            "resto": 33504334
+        },
+        {
+            "no": 33505308,
+            "now": "05/03/13(Fri)10:07",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33505089\" class=\"quotelink\">&gt;&gt;33505089</a><br><span class=\"quote\">&gt;if ( (*it)-&gt;getStatus() == &quot;starved&quot; )</span>",
+            "filename": "1359150577580",
+            "ext": ".jpg",
+            "w": 277,
+            "h": 244,
+            "tn_w": 124,
+            "tn_h": 110,
+            "tim": 1367590078388,
+            "time": 1367590078,
+            "md5": "tB3+9xcBH3qzIVs+YDu3bA==",
+            "fsize": 10896,
+            "resto": 33504334
+        },
+        {
+            "no": 33505350,
+            "now": "05/03/13(Fri)10:11",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33505302\" class=\"quotelink\">&gt;&gt;33505302</a><br>What? The pic is Safari (desktop) browser with<br>user agent string changed to pretend to be an iPhone.",
+            "time": 1367590280,
+            "resto": 33504334
+        },
+        {
+            "no": 33505388,
+            "now": "05/03/13(Fri)10:13",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33505350\" class=\"quotelink\">&gt;&gt;33505350</a><br>what ide u been using that let s you open the page in different browsers ? thinkin of learning some web dev,pretty soon,want to relax with that :)",
+            "time": 1367590433,
+            "resto": 33504334
+        },
+        {
+            "no": 33505395,
+            "now": "05/03/13(Fri)10:14",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33505308\" class=\"quotelink\">&gt;&gt;33505308</a><br>The complaint here is that the return value of getStatus appears to be &quot;stringly typed&quot; - that is, the compiler can&#039;t check for you that your status string is a valid value for the status field. This is acceptable if additional statuses can be defined dynamically by the user. However, you ought to use an enum type instead if the list of possible statuses is known at compile time.",
+            "time": 1367590450,
+            "resto": 33504334
+        },
+        {
+            "no": 33505419,
+            "now": "05/03/13(Fri)10:15",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33505089\" class=\"quotelink\">&gt;&gt;33505089</a><br><span class=\"quote\">&gt;referencing memory after deleting it</span><br>Is this something you sepples kids do?  Back in my day we always set things to NULL after we free()d them just to be sure this shit didn&#039;t happen.",
+            "time": 1367590522,
+            "resto": 33504334
+        },
+        {
+            "no": 33505421,
+            "now": "05/03/13(Fri)10:15",
+            "name": "Anonymous",
+            "email": "sage noko",
+            "com": "<span class=\"deadlink\">&gt;&gt;222222</span><br><a href=\"33504334#p33505302\" class=\"quotelink\">&gt;&gt;33505302</a><br><span class=\"quote\">&gt;t &lt;/span&gt;</span><br><span class=\"quote\">&gt;h &lt;span class=&quot;quote&gt;e&lt;/span&gt;</span><br><span class=\"quote\">&gt;&lt;span class=&quot;quote&gt;&gt;&lt;&gt;&gt;&lt;/span&gt;</span><br><br><pre class=\"prettyprint\">tests<br><pre class=\"prettyprint\">a<br></pre><br></pre>",
+            "filename": "1366492695058",
+            "ext": ".jpg",
+            "w": 400,
+            "h": 400,
+            "tn_w": 125,
+            "tn_h": 125,
+            "tim": 1367590523942,
+            "time": 1367590523,
+            "md5": "7juiudiMey4EyfwZPXYolQ==",
+            "fsize": 124633,
+            "resto": 33504334
+        },
+        {
+            "no": 33505439,
+            "now": "05/03/13(Fri)10:16",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33505170\" class=\"quotelink\">&gt;&gt;33505170</a><br>You sir are awesome. Thanks!",
+            "time": 1367590602,
+            "resto": 33504334
+        },
+        {
+            "no": 33505449,
+            "now": "05/03/13(Fri)10:17",
+            "name": "Anonymous",
+            "com": "<a href=\"33504334#p33505388\" class=\"quotelink\">&gt;&gt;33505388</a><br>No IDE, just open the page with different browsers lol.<br><br>The &quot;Develop&quot; menubar is built into Safari, most<br>other browsers have a config where you can change the user agent manually or some extension/addon that gives you a similar menu.<br><br>https://chrome.google.com/webstore/<wbr>detail/user-agent-switcher-for-c/dj<wbr>flhoibgkdhkhhcedjiklpkjnoahfmg?hl=e<wbr>n-US<br><br>https://addons.mozilla.org/en-US/fi<wbr>refox/addon/user-agent-switcher/",
+            "time": 1367590634,
+            "resto": 33504334
+        }
+    ]
+}
