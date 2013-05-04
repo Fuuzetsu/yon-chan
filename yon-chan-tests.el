@@ -53,6 +53,20 @@ test</span>"))
                                  :comment "This is a test")))
     (should (equalp (yon-build-post response) expected))))
 
+(ert-deftest test-yon-apply-quote-links ()
+  "Test that links to post and threads get formatted properly."
+  (let ((orig "<a href=\"579850#p579850\" class=\"quotelink\">>>579850</a>
+meanwhile, test
+<a href=\"/g/res/33526840#p33526840\" class=\"quotelink\">>>>/g/33526840</a>")
+        (expected ">>579850
+meanwhile, test
+>>>/g/33526840"))
+    (should (string= (with-temp-buffer
+                       (insert orig)
+                       (yon-apply-quotelinks)
+                       (buffer-string))
+                     expected))))
+
 ;;; Formatting
 
 (ert-deftest test-yon-format-post ()
