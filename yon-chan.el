@@ -69,7 +69,7 @@
   "Basic face for the post number.")
 
 (defface yon-face-post-number-link
-  '((default :weight bold :underline)
+  '((default :weight bold :underline t)
     (((class color)) :foreground "red3"))
   "Basic face for the post number.")
 
