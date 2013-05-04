@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 EMACS=${ECUKES_EMACS:-emacs}
+PRINT_ANYWAY="true"
 
-if [[ "$TRAVIS" == "true" ]]; then
+if [[ "$TRAVIS" == "true" || "$PRINT_ANYWAY" == "true" ]]; then
     $EMACS -batch -l ert -l elpa/mocker*/mocker.el -l yon-chan.el -l yon-chan-tests.el -f ert-run-tests-batch-and-exit
 else
     OUTPUT=$("$EMACS" -batch -l ert -l elpa/mocker*/mocker.el -l yon-chan.el -l yon-chan-tests.el -f ert-run-tests-batch-and-exit 2>&1)
