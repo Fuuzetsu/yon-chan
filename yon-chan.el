@@ -133,7 +133,87 @@
                 (insert (propertize cont
                                     'face colourface))))))))))
 
-
+(defun yon-make-quote-buttons ()
+  (let* ((start (string-match "<a href=\".*?\" class=\"quotelink\">.*?</a>" (yon-get-line-content)))
+         (op "<a href\"")
+         (ed  "</a>"))
+    (when start
+      (let* ((startn (+ start (line-beginning-position)))
+             (end (+ (yon-get-closing-point
+                      (yon-get-section startn (point-max)) ed)
+                     startn)))
+        (save-excursion
+          (goto-char startn)
+          (delete-char (+ 1 (length op)))
+          (goto-char (- end (+ 1 (length op))))
+          (delete-backward-char (length ed))
+          (goto-char startn)
+          (zap-to-char 1 (string-to-char "\""))
+          (delete-char (length " class=\"quotelink\">"))
+          (yank)
+          (delete-backward-char 1)
+          (insert " ")
+          (goto-char startn)
+          (let* ((split-cont (split-string
+                              (yon-get-section
+                               startn
+                               (- end (+ (length op)
+                                         (length " class=\"quotelink\">")
+                                         (length ed)
+                                         1))) ;; space
+                              " "))
+                 (link (split-string (car split-cont) "#"))
+                 (res-start (string-match "/res/" (car link))))
+            (progn
+              (delete-char (+ (length (car split-cont))
+                              (length (cadr split-cont))
+                              1))
+              (if res-start
+                  (progn
+                    (goto-char startn)
+                    (lexical-let* ((board
+                                    (with-temp-buffer
+                                      (insert (car link))
+                                      (goto-char (point-min))
+                                      (zap-to-char 2 (string-to-char "/")) ;; board
+                                      (delete-char (length "/res/"))
+                                      (yank)
+                                      (goto-char (point-min))
+                                      (delete-char 1)
+                                      (goto-char (point-max))
+                                      (delete-backward-char 1)
+                                      (buffer-string)))
+                                   (thread
+                                    (with-temp-buffer
+                                      (insert (car link))
+                                      (goto-char (point-min))
+                                      (delete-char (+ 2
+                                                      (length board)
+                                                      (length "res/")))
+                                      (buffer-string)))
+                                   (post
+                                    (with-temp-buffer
+                                      (insert (cadr link))
+                                      (goto-char (point-min))
+                                      (delete-char 1)
+                                      (buffer-string))))
+                      (let ((kmap (make-sparse-keymap)))
+                        (define-key kmap [mouse-2] (lambda () (message "TODO browse thread")))
+                        (insert-text-button (cadr split-cont)
+                                            'face 'yon-face-post-number
+                                            'keymap kmap))))
+                (lexical-let ((thread (car link))
+                              (post
+                               (with-temp-buffer
+                                 (insert (cadr link))
+                                 (goto-char (point-min))
+                                 (delete-char 1)
+                                 (buffer-string))))
+                  (let ((kmap (make-sparse-keymap)))
+                    (define-key kmap [mouse-2] (lambda () (message "TODO browse thread")))
+                    (insert-text-button (cadr split-cont)
+                                        'face 'yon-face-post-number
+                                        'keymap kmap)))))))))))
 ;; interactive for testing
 (defun yon-apply-deadlinks ()
   "Checks each line for deadlink replacement."
@@ -155,6 +235,12 @@
                               "<span class=\"quote\">" "</span>"
                               'yon-chan-greentext t)
              (forward-line 1))))
+
+(defun yon-apply-quotelinks ()
+  (goto-char (point-min))
+  (cl-loop until (eobp) do (yon-make-quote-buttons) (forward-line 1)))
+
+
 
 ;; Interactive for now for testing
 (defun yon-possibly-greenify-line ()
@@ -220,12 +306,16 @@
 
 ;;; Rendering
 
+(defun yon-apply-faces ()
+  (yon-apply-greenstuff)
+  (yon-apply-deadlinks)
+  (yon-apply-quotelinks))
+
 (defun yon-render (buffer proc obj)
   (with-current-buffer buffer
     (setq buffer-read-only nil)
     (insert (funcall proc obj))
-    (yon-apply-greenstuff)
-    (yon-apply-deadlinks)
+    (yon-apply-faces)
     (setq buffer-read-only t)))
 
 (defun yon-render-catalog (catalog)
@@ -274,8 +364,8 @@ The header consists of the subject, author, timestamp, and post number."
 (defun yon-format-post-number (post)
   "Returns a propertized number string."
   (propertize
-    (number-to-string (yon-post-number post))
-    'face 'yon-face-post-number))
+   (number-to-string (yon-post-number post))
+   'face 'yon-face-post-number))
 
 ;; let's hard code this for now
 (defun yon-browse-g (buffer)
