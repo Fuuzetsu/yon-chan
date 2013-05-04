@@ -70,7 +70,7 @@
     (((class color)) :foreground "red3"))
   "Basic face for the post number.")
 
-(defface yon-chan-deadlink
+(defface yon-face-deadlink
   '((default :strike-through t)
     (((class color)) :foreground "red2"))
   "Basic face for dead cross-links.")
@@ -230,7 +230,7 @@
     (goto-char (point-min))
     (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
                               "<span class=\"deadlink\">" "</span>"
-                              'yon-chan-deadlink t)
+                              'yon-face-deadlink t)
              (forward-line 1))))
 
 (defun yon-apply-greentext ()
