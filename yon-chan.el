@@ -347,7 +347,7 @@
 ;;; Rendering
 
 (defun yon-apply-faces ()
-  (yon-apply-greenstuff)
+  (yon-apply-greentext)
   (yon-apply-deadlinks)
   (yon-apply-quotelinks))
 
