@@ -203,7 +203,7 @@
                                       (delete-char 1)
                                       (buffer-string))))
                       (let ((kmap (make-sparse-keymap)))
-                        (define-key kmap [mouse-2]
+                        (define-key kmap (kbd "<return>")
                           (lambda ()
                             (interactive)
                             (yon-browse-thread
@@ -224,7 +224,7 @@
                               (kmap (make-sparse-keymap))
                               (board (with-current-buffer (buffer-name)
                                        yon-current-board)))
-                  (define-key kmap [mouse-2]
+                  (define-key kmap (kbd "<return>")
                     (lambda ()
                       (interactive)
                       (yon-browse-thread
