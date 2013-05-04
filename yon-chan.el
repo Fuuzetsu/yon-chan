@@ -40,7 +40,7 @@
 
 ;;; Faces
 
-(defface yon-chan-greentext
+(defface yon-face-greentext
   '((default)
     (((class color) (min-colors 16) (background light)) :foreground "ForestGreen")
     (((class color) (min-colors 88) (background dark))  :foreground "green3")
@@ -239,7 +239,7 @@
     (goto-char (point-min))
     (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
                               "<span class=\"quote\">" "</span>"
-                              'yon-chan-greentext t)
+                              'yon-face-greentext t)
              (forward-line 1))))
 
 (defun yon-apply-quotelinks ()
