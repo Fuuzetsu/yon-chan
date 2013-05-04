@@ -57,7 +57,8 @@ test</span>"))
   "Test that links to post and threads get formatted properly."
   (let ((orig "<a href=\"579850#p579850\" class=\"quotelink\">>>579850</a>
 meanwhile, test
-<a href=\"/g/res/33526840#p33526840\" class=\"quotelink\">>>>/g/33526840</a>")
+<a href=\"/g/res/33526840#p33526840\" class=\"quotelink\">>>>/g/3352
+g6840</a>")
         (expected ">>579850
 meanwhile, test
 >>>/g/33526840"))

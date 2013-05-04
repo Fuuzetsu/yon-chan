@@ -134,7 +134,7 @@
                                     'face colourface))))))))))
 
 (defun yon-make-quote-buttons ()
-  (let* ((start (string-match "<a href=\".*?\" class=\"quotelink\">.*?</a>" (yon-get-line-content)))
+  (let* ((start (string-match "<a href=\".*?\" class=\"quotelink\">" (yon-get-line-content)))
          (op "<a href\"")
          (ed  "</a>"))
     (when start
@@ -199,7 +199,7 @@
                                       (buffer-string))))
                       (let ((kmap (make-sparse-keymap)))
                         (define-key kmap [mouse-2] (lambda () (message "TODO browse thread")))
-                        (insert-text-button (cadr split-cont)
+                        (insert-text-button (yon-strip-newlines (cadr split-cont))
                                             'face 'yon-face-post-number
                                             'keymap kmap))))
                 (lexical-let ((thread (car link))
@@ -211,7 +211,7 @@
                                  (buffer-string))))
                   (let ((kmap (make-sparse-keymap)))
                     (define-key kmap [mouse-2] (lambda () (message "TODO browse thread")))
-                    (insert-text-button (cadr split-cont)
+                    (insert-text-button (yon-strip-newlines (cadr split-cont))
                                         'face 'yon-face-post-number
                                         'keymap kmap)))))))))))
 ;; interactive for testing
