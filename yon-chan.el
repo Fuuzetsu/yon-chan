@@ -401,10 +401,21 @@ The header consists of the subject, author, timestamp, and post number."
                          (when (boundp 'yon-current-board)
                              yon-current-board)))
                 (post-number (number-to-string (yon-post-number post))))
+    (define-key kmap (kbd "<return>")
+      (lambda ()
+        (interactive)
+        (yon-browse-thread
+         (switch-to-buffer-other-window
+          (generate-new-buffer
+           (concat "*yon-chan-/" board "/-" post-number)))
+         board post-number)))
     (if (and op board)
-        (concat "<a href=\"" post-number "#p" post-number "\" class=\"quotelink\">" post-number "</a>")
-      (propertize
-       post-number 'face 'yon-face-post-number))))
+        (with-temp-buffer
+          (insert-text-button post-number
+                              'face 'yon-face-post-number-link
+                              'keymap kmap)
+          (buffer-string))
+      (propertize post-number 'face 'yon-face-post-number))))
 
 ;; let's hard code this for now
 (defun yon-browse-board-catalog (buffer board)

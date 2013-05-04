@@ -123,12 +123,22 @@ meanwhile, test
                                         ((:input '("Anonymous") :output "Anonymous"))))
       (should (string= (yon-format-post-author post) "Anonymous")))))
 
-(ert-deftest test-yon-format-post-number ()
+(ert-deftest test-yon-format-post-number-not-op ()
   "Test formatting post number string"
   (let ((post (make-yon-post :number 1)))
+    (setq yon-current-board nil) ;; TODO set :replyto properly once merged
     (mocker-let ((propertize (text property value)
                              ((:input '("1" face yon-face-post-number)
                                       :output "1"))))
       (should (string= (yon-format-post-number post) "1")))))
+
+
+;; TODO set :replyto properly once merged
+;; I can't think of a way to properly unit test this…
+(ert-deftest test-yon-format-post-number-op ()
+  "Test formatting post number string"
+  (let ((post (make-yon-post :number 1)))
+    (setq yon-current-board "q")
+    (should (string= (yon-format-post-number post) "1"))))
 
 (provide 'yon-chan-tests)
