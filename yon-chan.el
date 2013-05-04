@@ -63,7 +63,7 @@
     (((class color)) :foreground "brown"))
   "Basic face for the post subject.")
 
-(defface yon-chan-post-number
+(defface yon-face-post-number
   '((default :weight bold)
     (((class color)) :foreground "red3"))
   "Basic face for the post number.")
