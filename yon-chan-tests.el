@@ -127,6 +127,24 @@ Why haven't you joined the 144p master race yet /g/?")))))))
     (should (equalp (yon-build-post response) expected))))
 
 
+(ert-deftest test-yon-apply-quote-links ()
+  "Test that links to post and threads get formatted properly."
+  (let ((orig "<a href=\"579850#p579850\" class=\"quotelink\">>>579850</a>
+meanwhile, test
+<a href=\"/g/res/33526840#p33526840\" class=\"quotelink\">>>>/g/3352
+6840</a>")
+        (expected ">>579850
+meanwhile, test
+>>>/g/33526840"))
+    (should (string= (with-temp-buffer
+                       (insert orig)
+                       (with-current-buffer (buffer-name)
+                         (set (make-local-variable 'yon-current-board) "q"))
+                       (yon-apply-quotelinks)
+                       (buffer-string))
+                     expected))))
+
+
 (ert-deftest test-yon-apply-deadlinks ()
   "Test that deadlinks are properly caught and substituted"
   (let ((input-text "top empty
@@ -191,9 +209,9 @@ end test"))
     (mocker-let ((yon-format-post-subject (p)
                                           ((:input (list post) :output "subject")))
                  (yon-format-post-author (p)
-                                          ((:input (list post) :output "author")))
+                                         ((:input (list post) :output "author")))
                  (yon-format-post-timestamp (p)
-                                          ((:input (list post) :output "the time")))
+                                            ((:input (list post) :output "the time")))
                  (yon-format-post-number (p)
                                          ((:input (list post) :output 1))))
       (should (string= (yon-format-post-header post)
@@ -226,12 +244,23 @@ end test"))
                                         ((:input '("Anonymous") :output "Anonymous"))))
       (should (string= (yon-format-post-author post) "Anonymous")))))
 
-(ert-deftest test-yon-format-post-number ()
+(ert-deftest test-yon-format-post-number-not-op ()
   "Test formatting post number string"
-  (let ((post (make-yon-post :number 1)))
+  (let ((post (make-yon-post :number 1
+                             :replyto 1337)))
     (mocker-let ((propertize (text property value)
                              ((:input '("1" face yon-face-post-number)
                                       :output "1"))))
       (should (string= (yon-format-post-number post) "1")))))
+
+
+;; I can't think of a way to properly unit test this…
+(ert-deftest test-yon-format-post-number-op ()
+  "Test formatting post number string"
+  (let ((post (make-yon-post :number 1
+                             :replyto 0)))
+    (with-current-buffer (current-buffer)
+      (set (make-local-variable 'yon-current-board) "q"))
+    (should (string= (yon-format-post-number post) "1"))))
 
 (provide 'yon-chan-tests)
