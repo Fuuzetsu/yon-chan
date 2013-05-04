@@ -167,7 +167,7 @@
                                          (length ed)
                                          1))) ;; space
                               " "))
-                 (link (split-string (car split-cont) "#"))
+                 (link (split-string (car split-cont) "#p"))
                  (res-start (string-match "/res/" (car link))))
             (progn
               (delete-char (+ (length (car split-cont))
@@ -196,12 +196,7 @@
                                                       (length board)
                                                       (length "res/")))
                                       (buffer-string)))
-                                   (post
-                                    (with-temp-buffer
-                                      (insert (cadr link))
-                                      (goto-char (point-min))
-                                      (delete-char 1)
-                                      (buffer-string))))
+                                   (post (cadr link)))
                       (let ((kmap (make-sparse-keymap)))
                         (define-key kmap (kbd "<return>")
                           (lambda ()
@@ -215,12 +210,7 @@
                                             'face 'yon-face-post-number-link
                                             'keymap kmap))))
                 (lexical-let ((thread (car link))
-                              (post
-                               (with-temp-buffer
-                                 (insert (cadr link))
-                                 (goto-char (point-min))
-                                 (delete-char 1)
-                                 (buffer-string)))
+                              (post (cadr link)) ;; for future use, post jumping
                               (kmap (make-sparse-keymap))
                               (board (with-current-buffer (buffer-name)
                                        yon-current-board)))
