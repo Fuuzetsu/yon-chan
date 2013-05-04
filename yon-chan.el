@@ -424,7 +424,7 @@ The header consists of the subject, author, timestamp, and post number."
   (with-current-buffer (switch-to-buffer-other-window
                         (generate-new-buffer "*yon-chan*"))
     (yon-chan-mode)
-    (yon-browse-board-catalog (current-buffer "g"))))
+    (yon-browse-board-catalog (current-buffer) "g")))
 
 
 (provide 'yon-chan)
