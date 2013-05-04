@@ -394,8 +394,8 @@ The header consists of the subject, author, timestamp, and post number."
    'face 'yon-face-post-number))
 
 ;; let's hard code this for now
-(defun yon-browse-g (buffer)
-  (url-retrieve "http://api.4chan.org/g/catalog.json"
+(defun yon-browse-board-catalog (buffer board)
+  (url-retrieve (concat "http://api.4chan.org/" board "/catalog.json")
                 (lexical-let ((yon-buffer buffer))
                   (lambda (status)
                     (yon-render yon-buffer
@@ -420,7 +420,7 @@ The header consists of the subject, author, timestamp, and post number."
   (with-current-buffer (switch-to-buffer-other-window
                         (generate-new-buffer "*yon-chan*"))
     (yon-chan-mode)
-    (yon-browse-g (current-buffer))))
+    (yon-browse-board-catalog (current-buffer "g"))))
 
 
 (provide 'yon-chan)
