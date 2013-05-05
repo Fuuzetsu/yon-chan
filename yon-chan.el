@@ -337,8 +337,10 @@
                  :renderpos      '()))
 
 
-(defun yon-build-thread (response)
-  (mapcar 'yon-build-post (yon-elem response 'posts)))
+(defun yon-build-thread (response buffer)
+  (with-current-buffer buffer
+    (set (make-local-variable 'yon-buffer-posts)
+         (mapcar 'yon-build-post (yon-elem response 'posts)))))
 
 (defun yon-build-catalog (response)
   (mapcar 'yon-build-page response))
@@ -441,6 +443,15 @@ The header consists of the subject, author, timestamp, and post number."
           (buffer-string))
       (propertize post-number 'face 'yon-face-post-number))))
 
+(defun yon-jump-to-local-post (number)
+  (let ((render-place))
+    (dolist (post (with-current-buffer (current-buffer) yon-buffer-posts))
+      (when (equal number (yon-post-number post))
+        (setq render-place (yon-post-renderpos post))))
+    (if render-place
+        (goto-char render-place)
+      (message "Could not find post %s to jump to." (number-to-string number)))))
+
 (defun yon-browse-board-catalog (buffer board)
   (url-retrieve (concat "http://api.4chan.org/" board "/catalog.json")
                 (lexical-let ((yon-buffer buffer))
@@ -455,12 +466,12 @@ The header consists of the subject, author, timestamp, and post number."
   (url-retrieve
    (concat "http://api.4chan.org/" board "/res/" thread-number ".json")
    (lexical-let ((yon-buffer buffer))
-     (with-current-buffer buffer
+     (with-current-buffer yon-buffer
        (set (make-local-variable 'yon-current-board) board))
      (lambda (status)
        (yon-render yon-buffer
                    'yon-render-thread
-                   (yon-build-thread (yon-get-and-parse-json)))))))
+                   (yon-build-thread (yon-get-and-parse-json) yon-buffer))))))
 
 ;;;###autoload
 (defun yon-chan ()
