@@ -137,7 +137,8 @@
 
 
 (defun yon-make-quote-buttons ()
-  (let* ((start (string-match "<a href=\".*?\" class=\"quotelink\">" (yon-get-line-content)))
+  (let* ((start (string-match "<a href=\".*?\" class=\"quotelink\">"
+                              (yon-get-line-content)))
          (op "<a href\"")
          (ed  "</a>"))
     (when start
@@ -208,18 +209,14 @@
                                             'face 'yon-face-post-number-link
                                             'keymap kmap))))
                 (lexical-let ((thread (car link))
-                              (post (cadr link)) ;; for future use, post jumping
+                              (post (cadr link))
                               (kmap (make-sparse-keymap))
                               (board (with-current-buffer (buffer-name)
                                        yon-current-board)))
                   (define-key kmap (kbd "<return>")
                     (lambda ()
                       (interactive)
-                      (yon-browse-thread
-                       (switch-to-buffer-other-window
-                        (generate-new-buffer
-                         (concat "*yon-chan-/" board "/-" thread)))
-                       board thread)))
+                      (yon-jump-to-local-post (string-to-number post))))
                   (insert-text-button (yon-strip-newlines (cadr split-cont))
                                       'face 'yon-face-post-number-link
                                       'keymap kmap))))))))))
