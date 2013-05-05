@@ -514,26 +514,43 @@ The header consists of the subject, author, timestamp, and post number."
 
 (defun yon-browse-board-catalog (buffer board)
   (url-retrieve (concat "http://api.4chan.org/" board "/catalog.json")
-                (lexical-let ((yon-buffer buffer))
+                (lexical-let ((yon-buffer buffer)
+                              (board-l board))
                   (with-current-buffer yon-buffer
                     (yon-chan-mode)
-                    (set (make-local-variable 'yon-current-board) board))
-                  (lambda (status)
-                    (yon-render yon-buffer
-                                'yon-render-catalog
-                                (yon-build-catalog (yon-get-and-parse-json) yon-buffer))))))
+                    (set (make-local-variable 'yon-current-board) board)
+                    (set (make-local-variable 'yon-refresh)
+                         (lambda ()
+                           "Function called when we want to refresh the catalog"
+                           (yon-browse-board-catalog yon-buffer board-l)))
+                    (lambda (status)
+                      (yon-render yon-buffer
+                                  'yon-render-catalog
+                                  (yon-build-catalog (yon-get-and-parse-json)
+                                                     yon-buffer)))))))
+
+(defun yon-refresh-buffer (&optional buffer)
+  "Refreshes arbitrary buffer"
+  (with-current-buffer (if buffer buffer (current-buffer))
+    (funcall yon-refresh)))
 
 (defun yon-browse-thread (buffer board thread-number)
   (url-retrieve
    (concat "http://api.4chan.org/" board "/res/" thread-number ".json")
-   (lexical-let ((yon-buffer buffer))
+   (lexical-let ((yon-buffer buffer)
+                 (board-l board)
+                 (thread-number-l thread-number))
      (with-current-buffer yon-buffer
        (yon-chan-mode)
-       (set (make-local-variable 'yon-current-board) board))
-     (lambda (status)
-       (yon-render yon-buffer
-                   'yon-render-thread
-                   (yon-build-thread (yon-get-and-parse-json) yon-buffer))))))
+       (set (make-local-variable 'yon-current-board) board)
+       (set (make-local-variable 'yon-refresh)
+            (lambda ()
+              "Function called when we want to refresh the whole thread"
+              (yon-browse-thread yon-buffer board-l thread-number-l)))
+       (lambda (status)
+         (yon-render yon-buffer
+                     'yon-render-thread
+                     (yon-build-thread (yon-get-and-parse-json) yon-buffer)))))))
 
 ;;;###autoload
 (defun yon-chan ()
