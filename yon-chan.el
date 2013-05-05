@@ -351,8 +351,16 @@
     (set (make-local-variable 'yon-buffer-posts)
          (mapcar 'yon-build-post (yon-elem response 'posts)))))
 
-(defun yon-build-catalog (response)
-  (mapcar 'yon-build-page response))
+(defun flatten(x)
+  (cond ((null x) nil)
+    ((listp x) (append (flatten (car x)) (flatten (cdr x))))
+    (t (list x))))
+
+(defun yon-build-catalog (response buffer)
+  (with-current-buffer buffer
+    (let ((pages (mapcar 'yon-build-page response)))
+      (set (make-local-variable 'yon-buffer-posts) (flatten pages))
+      pages)))
 
 (defun yon-build-page (response)
   (mapcar 'yon-build-post (yon-elem response 'threads)))
@@ -375,11 +383,12 @@
     (goto-char (point-min))))
 
 (defun yon-render-catalog (catalog)
-  (insert (mapconcat 'yon-render-catalog-page catalog "\n")))
+  (mapc 'yon-render-catalog-page catalog))
 
 (defun yon-render-catalog-page (page)
-  (yon-apply-faces
-     (mapconcat 'yon-format-post page "\n")))
+  (dolist (post page)
+    (setf (yon-post-renderpos post) (point))
+    (insert (concat (yon-apply-faces (yon-format-post post)) "\n"))))
 
 (defun yon-render-thread (posts)
   (let ((op (car posts))
@@ -510,7 +519,7 @@ The header consists of the subject, author, timestamp, and post number."
                   (lambda (status)
                     (yon-render yon-buffer
                                 'yon-render-catalog
-                                (yon-build-catalog (yon-get-and-parse-json)))))))
+                                (yon-build-catalog (yon-get-and-parse-json) yon-buffer))))))
 
 (defun yon-browse-thread (buffer board thread-number)
   (url-retrieve
