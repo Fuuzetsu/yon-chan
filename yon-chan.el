@@ -354,6 +354,7 @@
 (defun yon-render (buffer proc obj)
   (with-current-buffer buffer
     (setq buffer-read-only nil)
+    (erase-buffer) ;; in case we are refreshing
     (insert (funcall proc obj))
     (yon-apply-faces)
     (setq buffer-read-only t)
@@ -444,12 +445,23 @@ The header consists of the subject, author, timestamp, and post number."
                                 'yon-render-catalog
                                 (yon-build-catalog (yon-get-and-parse-json)))))))
 
+(defun yon-refresh-thread (&optional buffer)
+  "Refreshes arbitrary buffer"
+  (with-current-buffer (if buffer buffer (current-buffer))
+    (funcall yon-refresh)))
+
 (defun yon-browse-thread (buffer board thread-number)
   (url-retrieve
    (concat "http://api.4chan.org/" board "/res/" thread-number ".json")
-   (lexical-let ((yon-buffer buffer))
+   (lexical-let ((yon-buffer buffer)
+                 (board-l board)
+                 (thread-number-l thread-number))
      (with-current-buffer yon-buffer
-       (set (make-local-variable 'yon-current-board) board))
+       (set (make-local-variable 'yon-current-board) board)
+       (set (make-local-variable 'yon-refresh)
+            (lambda ()
+              "Function called when we want to refresh the whole thread"
+              (yon-browse-thread yon-buffer board-l thread-number-l))))
      (lambda (status)
        (yon-render yon-buffer
                    'yon-render-thread
