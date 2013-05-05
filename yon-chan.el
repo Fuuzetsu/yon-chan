@@ -297,7 +297,7 @@
   filename replyto sticky closed time trip id capcode country
   country_name email ext fsize md5 image_w image_h thumbnail_w thumbnail_h
   filedeleted spoiler custom_spoiler omitted_posts omitted_images replies
-  images bumplimit imagelimit new_filename)
+  images bumplimit imagelimit new_filename renderpos)
 
 (defun yon-build-post (response)
   "Builds a post object from deserialized JSON response."
@@ -333,7 +333,9 @@
                  :replies        (yon-elem response 'replies)
                  :images         (yon-elem response 'images)
                  :bumplimit      (yon-elem response 'bumplimit)
-                 :imagelimit     (yon-elem response 'imagelimit)))
+                 :imagelimit     (yon-elem response 'imagelimit)
+                 :renderpos      '()))
+
 
 (defun yon-build-thread (response)
   (mapcar 'yon-build-post (yon-elem response 'posts)))
@@ -354,24 +356,29 @@
 (defun yon-render (buffer proc obj)
   (with-current-buffer buffer
     (setq buffer-read-only nil)
-    (insert (funcall proc obj))
+    (funcall proc obj)
     (yon-apply-faces)
     (setq buffer-read-only t)
     (goto-char (point-min))))
 
 (defun yon-render-catalog (catalog)
-  (mapconcat 'yon-render-catalog-page catalog "\n"))
+  (insert
+   (mapconcat 'yon-render-catalog-page catalog "\n")))
 
 (defun yon-render-catalog-page (page)
-  (mapconcat 'yon-format-post page "\n"))
+  (insert
+   (mapconcat 'yon-format-post page "\n")))
 
 (defun yon-render-thread (posts)
   (let ((op (car posts))
         (replies (cdr posts)))
-    (concat (yon-format-post op) "\n"
-            (mapconcat (lambda (x) (replace-regexp-in-string ;; for now
-                                    "^" "    "
-                                    (yon-format-post x))) replies "\n"))))
+    (setf (yon-post-renderpos op) (point))
+    (insert (concat (yon-format-post op)) "\n")
+    (dolist (post replies)
+      (setf (yon-post-renderpos post) (point))
+      (insert
+       (concat (replace-regexp-in-string "^" "    "
+                (yon-format-post post)) "\n")))))
 
 ;;; Formatting
 

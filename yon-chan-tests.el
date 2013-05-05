@@ -98,7 +98,7 @@ test</span>"))
     (insert-file-contents "features/stubs/small-catalog.json")
     (let* ((catalog (yon-build-catalog (yon-parse-json (buffer-string)))))
       (with-temp-buffer
-        (insert (yon-render-catalog catalog))
+        (yon-render-catalog catalog)
         (should (string= (buffer-string)
                          (concat "No subject - Anonymous - 05/03/13(Fri)10:16 - 33505434
 Anyone still using their Raspberry Pi or did you get bored? "
