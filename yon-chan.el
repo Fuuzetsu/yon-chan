@@ -32,16 +32,12 @@
 
 (define-derived-mode yon-chan-mode
   special-mode "Yon-chan"
-  "4chan browser.")
+  "4chan browser."
+  (define-key yon-chan-mode-map (kbd "n") 'yon-jump-post-forward)
+  (define-key yon-chan-mode-map (kbd "p") 'yon-jump-post-backward))
 
-(defun yon-mode-keys ()
-  "Set local key defs for yon-mode"
-  ;; (define-key yon-mode-map "n" 'yon-jump-post-forward)
-  ;; (define-key yon-mode-map "p" 'yon-jump-mode-backward)
-  ;; (define-key yon-mode-map "q" 'quit-window)
-  )
-
-
+(defvar yon-chan-mode-map (make-sparse-keymap)
+  "yon-chan-mode keymap")
 
 
 ;;; Faces
@@ -510,7 +506,8 @@ The header consists of the subject, author, timestamp, and post number."
   (url-retrieve (concat "http://api.4chan.org/" board "/catalog.json")
                 (lexical-let ((yon-buffer buffer))
                   (with-current-buffer yon-buffer
-                    (set (make-local-variable 'yon-current-board) board))
+                    (set (make-local-variable 'yon-current-board) board)
+                    (yon-chan-mode))
                   (lambda (status)
                     (yon-render yon-buffer
                                 'yon-render-catalog
@@ -521,6 +518,7 @@ The header consists of the subject, author, timestamp, and post number."
    (concat "http://api.4chan.org/" board "/res/" thread-number ".json")
    (lexical-let ((yon-buffer buffer))
      (with-current-buffer yon-buffer
+       (yon-chan-mode)
        (set (make-local-variable 'yon-current-board) board))
      (lambda (status)
        (yon-render yon-buffer
