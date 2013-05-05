@@ -497,7 +497,9 @@ The header consists of the subject, author, timestamp, and post number."
       (when (equal number (yon-post-number post))
         (setq render-place (yon-post-renderpos post))))
     (if render-place
-        (goto-char render-place)
+        (progn
+          (goto-char render-place)
+          (recenter-top-bottom 0)) ;; I'm not too sure about this
       (message "Could not find post %s to jump to." (number-to-string number)))))
 
 (defun yon-jump-post-forward (&optional number)
