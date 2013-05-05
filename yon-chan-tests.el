@@ -136,12 +136,8 @@ meanwhile, test
         (expected ">>579850
 meanwhile, test
 >>>/g/33526840"))
-    (should (string= (with-temp-buffer
-                       (insert orig)
-                       (with-current-buffer (buffer-name)
-                         (set (make-local-variable 'yon-current-board) "q"))
-                       (yon-apply-quotelinks)
-                       (buffer-string))
+    (set (make-local-variable 'yon-current-board) "q")
+    (should (string= (yon-apply-quotelinks orig)
                      expected))))
 
 
@@ -158,10 +154,8 @@ Midline deadlink >>>/g/123456 endline
 more text
 midbroken >>>/g/64257533 deadlink
 end test"))
-    (with-temp-buffer
-      (insert input-text)
-      (yon-apply-deadlinks)
-      (should (string= result-text (buffer-string))))))
+    (set (make-local-variable 'yon-current-board) "g")
+    (should (string= result-text (yon-apply-deadlinks input-text)))))
 
 (ert-deftest test-yon-apply-greentext ()
   "Test that greentext is properly caught and substituted"
@@ -187,10 +181,8 @@ even more text
 >Multi track greentext!
 >
 end test"))
-    (with-temp-buffer
-      (insert input-text)
-      (yon-apply-greentext)
-      (should (string= result-text (buffer-string))))))
+    (set (make-local-variable 'yon-current-board) "g")
+    (should (string= result-text (yon-apply-greentext input-text)))))
 
 ;;; Formatting
 
