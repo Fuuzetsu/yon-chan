@@ -34,9 +34,15 @@
   special-mode "Yon-chan"
   "4chan browser.")
 
-;; (defun yon-mode-keys ()
-;;   "Set local key defs for yon-mode"
-;;   (define-key yon-mode-map "q" 'quit-window)
+(defun yon-mode-keys ()
+  "Set local key defs for yon-mode"
+  ;; (define-key yon-mode-map "n" 'yon-jump-post-forward)
+  ;; (define-key yon-mode-map "p" 'yon-jump-mode-backward)
+  ;; (define-key yon-mode-map "q" 'quit-window)
+  )
+
+
+
 
 ;;; Faces
 
@@ -453,21 +459,33 @@ The header consists of the subject, author, timestamp, and post number."
           (buffer-string))
       (propertize post-number 'face 'yon-face-post-number))))
 
-(defun yon-jump-to-next-post ()
-  "Jumps to the next post in the thread."
-  (interactive)
+
+(defun yon-jump-posts (amount)
+  "Jumps `amount' of posts. Can be negative."
   (let* ((posts (with-current-buffer (current-buffer) yon-buffer-posts))
-         (candidate (yon-post-renderpos (car (last posts)))))
-    (if (< candidate (point)) ;; point is past last post
-        (progn
-          (message "No more posts. Going to the last one.")
-          (goto-char candidate))
-      (progn
-        (dolist (post posts)
-          (let ((rp (yon-post-renderpos post)))
-            (when (and (> rp (point)) (< (+ (point) rp) (+ (point) candidate)))
-              (setq candidate rp))))
-        (goto-char candidate)))))
+
+         (sorted-posts (sort yon-buffer-posts
+                             (lambda (x y)
+                                 ;; This currently is just a safety measure,
+                                 ;; they should be presorted for now.
+                                 "Sorts posts based on their render position."
+                                 (< (yon-post-renderpos x)
+                                    (yon-post-renderpos y)))))
+         (closest-post-index
+          (let ((closest (yon-post-renderpos (car posts)))
+                (index 0))
+            (dotimes (idx (length sorted-posts)) ;; it's like I'm really writing C!
+              (let ((rp (yon-post-renderpos (nth idx sorted-posts))))
+                (when (> (abs (- (point) closest)) (abs (- (point) rp)))
+                  (setq closest rp)
+                  (setq index idx))))
+            index))
+         (new-idx (+ closest-post-index amount)))
+    (if (< new-idx 0)
+        (yon-jump-to-local-post (yon-post-number (nth 0 sorted-posts)))
+      (if (>= new-idx (length sorted-posts))
+          (yon-jump-to-local-post (yon-post-number (car (last sorted-posts))))
+        (yon-jump-to-local-post (yon-post-number (nth new-idx sorted-posts)))))))
 
 (defun yon-jump-to-local-post (number)
   (let ((render-place))
@@ -477,6 +495,16 @@ The header consists of the subject, author, timestamp, and post number."
     (if render-place
         (goto-char render-place)
       (message "Could not find post %s to jump to." (number-to-string number)))))
+
+(defun yon-jump-post-forward (&optional number)
+  "Jump backward one post. Jump forward `n' posts if given an argument."
+  (interactive "p")
+  (yon-jump-posts number))
+
+(defun yon-jump-post-backward (&optional number)
+  "Jump backward one post. Jump backward `n' posts if given an argument."
+  (interactive "p")
+  (yon-jump-posts (* -1 number)))
 
 (defun yon-browse-board-catalog (buffer board)
   (url-retrieve (concat "http://api.4chan.org/" board "/catalog.json")
