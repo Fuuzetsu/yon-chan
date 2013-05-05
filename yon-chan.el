@@ -265,15 +265,6 @@
         (cl-loop until (eobp) do (yon-make-quote-buttons) (forward-line 1))
         (buffer-string)))))
 
-
-
-;; Interactive for now for testing
-(defun yon-possibly-greenify-line ()
-  "Least elegant function that will replace quotes with greentext."
-  (interactive)
-  (let ((op "<span class=\"quote\">")
-        (ed "</span>"))))
-
 (defun yon-strip-newlines (body)
   (replace-regexp-in-string "\n" "" body))
 
