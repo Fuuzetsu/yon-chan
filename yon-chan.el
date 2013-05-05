@@ -34,7 +34,8 @@
   special-mode "Yon-chan"
   "4chan browser."
   (define-key yon-chan-mode-map (kbd "n") 'yon-jump-post-forward)
-  (define-key yon-chan-mode-map (kbd "p") 'yon-jump-post-backward))
+  (define-key yon-chan-mode-map (kbd "p") 'yon-jump-post-backward)
+  (define-key yon-chan-mode-map (kbd "r") 'yon-refresh-buffer))
 
 (defvar yon-chan-mode-map (make-sparse-keymap)
   "yon-chan-mode keymap")
@@ -531,6 +532,7 @@ The header consists of the subject, author, timestamp, and post number."
 
 (defun yon-refresh-buffer (&optional buffer)
   "Refreshes arbitrary buffer"
+  (interactive)
   (with-current-buffer (if buffer buffer (current-buffer))
     (funcall yon-refresh)))
 
