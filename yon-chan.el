@@ -443,6 +443,22 @@ The header consists of the subject, author, timestamp, and post number."
           (buffer-string))
       (propertize post-number 'face 'yon-face-post-number))))
 
+(defun yon-jump-to-next-post ()
+  "Jumps to the next post in the thread."
+  (interactive)
+  (let* ((posts (with-current-buffer (current-buffer) yon-buffer-posts))
+         (candidate (yon-post-renderpos (car (last posts)))))
+    (if (< candidate (point)) ;; point is past last post
+        (progn
+          (message "No more posts. Going to the last one.")
+          (goto-char candidate))
+      (progn
+        (dolist (post posts)
+          (let ((rp (yon-post-renderpos post)))
+            (when (and (> rp (point)) (< (+ (point) rp) (+ (point) candidate)))
+              (setq candidate rp))))
+        (goto-char candidate)))))
+
 (defun yon-jump-to-local-post (number)
   (let ((render-place))
     (dolist (post (with-current-buffer (current-buffer) yon-buffer-posts))
