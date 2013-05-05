@@ -213,18 +213,33 @@
                         (insert-text-button (yon-strip-newlines (cadr split-cont))
                                             'face 'yon-face-post-number-link
                                             'keymap kmap))))
-                (lexical-let ((thread (car link))
-                              (post (cadr link))
-                              (kmap (make-sparse-keymap))
-                              (board (with-current-buffer (buffer-name)
-                                       yon-current-board)))
-                  (define-key kmap (kbd "<return>")
-                    (lambda ()
-                      (interactive)
-                      (yon-jump-to-local-post (string-to-number post))))
-                  (insert-text-button (yon-strip-newlines (cadr split-cont))
-                                      'face 'yon-face-post-number-link
-                                      'keymap kmap))))))))))
+                (if (equal 1 (length link)) ;; simple link such as >>>/a/
+                    (lexical-let ((board (car link))
+                                  (kmap (make-sparse-keymap)))
+                      (define-key kmap (kbd "<return>")
+                        (lambda ()
+                          (interactive)
+                          (yon-browse-board-catalog
+                           (switch-to-buffer-other-window
+                            (generate-new-buffer
+                             (concat "*yon-chan-/" board "/*")))
+                           (substring board 1 (- (length board) 1)))))
+                      (insert-text-button (yon-strip-newlines (cadr split-cont))
+                                          'face 'yon-face-post-number-link
+                                          'keymap kmap)
+                      )
+                  (lexical-let ((thread (car link))
+                                (post (cadr link))
+                                (kmap (make-sparse-keymap))
+                                (board (with-current-buffer (buffer-name)
+                                         yon-current-board)))
+                    (define-key kmap (kbd "<return>")
+                      (lambda ()
+                        (interactive)
+                        (yon-jump-to-local-post (string-to-number post))))
+                    (insert-text-button (yon-strip-newlines (cadr split-cont))
+                                        'face 'yon-face-post-number-link
+                                        'keymap kmap)))))))))))
 
 (defun yon-apply-deadlinks (text)
   "Checks each line for deadlink replacement."
@@ -590,7 +605,7 @@ The header consists of the subject, author, timestamp, and post number."
   (with-current-buffer (switch-to-buffer-other-window
                         (generate-new-buffer "*yon-chan*"))
     (yon-chan-mode)
-    (yon-browse-board-catalog (current-buffer) "g")))
+    (yon-browse-board-catalog (current-buffer) "q")))
 
 
 (provide 'yon-chan)

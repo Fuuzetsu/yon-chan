@@ -140,10 +140,12 @@ Why haven't you joined the 144p master race yet /g/?
   (let ((orig "<a href=\"579850#p579850\" class=\"quotelink\">>>579850</a>
 meanwhile, test
 <a href=\"/g/res/33526840#p33526840\" class=\"quotelink\">>>>/g/3352
-6840</a>")
+6840</a>
+<a href=\"/pol/\" class=\"quotelink\">>>>/pol/</a>")
         (expected ">>579850
 meanwhile, test
->>>/g/33526840"))
+>>>/g/33526840
+>>>/pol/"))
     (set (make-local-variable 'yon-current-board) "q")
     (should (string= (yon-apply-quotelinks orig)
                      expected))))
