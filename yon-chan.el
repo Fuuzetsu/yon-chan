@@ -113,7 +113,8 @@
 ;; Interactive for now for testing
 (defun yon-possibly-colorify-line-by-tags
   (opregex endregex colourface &optional newline)
-  "Least elegant function that will replace quotes with greentext."
+  "Applies colourface to anything between opregex and endregex.
+If newline is non-nil, newlines in the matching text will be removed."
   (interactive)
   (let ((start (string-match opregex (yon-get-line-content)))
         (op opregex)
