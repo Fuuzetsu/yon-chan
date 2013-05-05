@@ -224,27 +224,46 @@
                                       'face 'yon-face-post-number-link
                                       'keymap kmap))))))))))
 
-(defun yon-apply-deadlinks ()
+(defun yon-apply-deadlinks (text)
   "Checks each line for deadlink replacement."
   (save-excursion
-    (goto-char (point-min))
-    (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
-                              "<span class=\"deadlink\">" "</span>"
-                              'yon-face-deadlink t)
-             (forward-line 1))))
+    (lexical-let ((board (with-current-buffer (current-buffer)
+                           yon-current-board)))
+      (with-temp-buffer
+        (set (make-local-variable 'yon-current-board) board)
+        (insert text)
+        (goto-char (point-min))
+        (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
+                                  "<span class=\"deadlink\">" "</span>"
+                                  'yon-face-deadlink t)
+                 (forward-line 1))
+        (buffer-string)))))
 
-(defun yon-apply-greentext ()
+(defun yon-apply-greentext (text)
   "Checks each line for greentext replacement."
   (save-excursion
-    (goto-char (point-min))
-    (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
-                              "<span class=\"quote\">" "</span>"
-                              'yon-face-greentext t)
-             (forward-line 1))))
+    (lexical-let ((board (with-current-buffer (current-buffer)
+                           yon-current-board)))
+      (with-temp-buffer
+        (set (make-local-variable 'yon-current-board) board)
+        (insert text)
+        (goto-char (point-min))
+        (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
+                                  "<span class=\"quote\">" "</span>"
+                                  'yon-face-greentext t)
+                 (forward-line 1))
+        (buffer-string)))))
 
-(defun yon-apply-quotelinks ()
-  (goto-char (point-min))
-  (cl-loop until (eobp) do (yon-make-quote-buttons) (forward-line 1)))
+(defun yon-apply-quotelinks (text)
+  (save-excursion
+    (lexical-let ((board (with-current-buffer (current-buffer)
+                           yon-current-board)))
+      (with-temp-buffer
+        (set (make-local-variable 'yon-current-board) board)
+        (insert text)
+        (goto-char (point-min))
+        (cl-loop until (eobp) do (yon-make-quote-buttons) (forward-line 1))
+        (buffer-string)))))
 
 
 
@@ -350,37 +369,40 @@
 
 ;;; Rendering
 
-(defun yon-apply-faces ()
-  (yon-apply-greentext)
-  (yon-apply-deadlinks)
-  (yon-apply-quotelinks))
+(defmacro $. (f g x)
+  `(,f (,g ,x)))
+
+(defun yon-apply-faces (text)
+  ($. yon-apply-quotelinks
+      yon-apply-deadlinks
+      (yon-apply-greentext text)))
 
 (defun yon-render (buffer proc obj)
   (with-current-buffer buffer
     (setq buffer-read-only nil)
     (funcall proc obj)
-    (yon-apply-faces)
+    ;;(yon-apply-faces)
     (setq buffer-read-only t)
     (goto-char (point-min))))
 
 (defun yon-render-catalog (catalog)
-  (insert
-   (mapconcat 'yon-render-catalog-page catalog "\n")))
+  (insert (mapconcat 'yon-render-catalog-page catalog "\n")))
 
 (defun yon-render-catalog-page (page)
-  (insert
-   (mapconcat 'yon-format-post page "\n")))
+  (yon-apply-faces
+     (mapconcat 'yon-format-post page "\n")))
 
 (defun yon-render-thread (posts)
   (let ((op (car posts))
         (replies (cdr posts)))
     (setf (yon-post-renderpos op) (point))
-    (insert (concat (yon-format-post op)) "\n")
+    (insert (yon-apply-faces (concat (yon-format-post op))) "\n")
     (dolist (post replies)
       (setf (yon-post-renderpos post) (point))
       (insert
-       (concat (replace-regexp-in-string "^" "    "
-                (yon-format-post post)) "\n")))))
+       (concat (yon-apply-faces
+                (replace-regexp-in-string "^" "    "
+                                          (yon-format-post post))) "\n")))))
 
 ;;; Formatting
 
