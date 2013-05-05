@@ -437,15 +437,20 @@ The header consists of the subject, author, timestamp, and post number."
 
 (defun yon-browse-board-catalog (buffer board)
   (url-retrieve (concat "http://api.4chan.org/" board "/catalog.json")
-                (lexical-let ((yon-buffer buffer))
+                (lexical-let ((yon-buffer buffer)
+                              (board-l board))
                   (with-current-buffer yon-buffer
-                    (set (make-local-variable 'yon-current-board) board))
+                    (set (make-local-variable 'yon-current-board) board)
+                    (set (make-local-variable 'yon-refresh)
+                         (lambda ()
+                           "Function called when we want to refresh the catalog"
+                           (yon-browse-board-catalog yon-buffer board-l))))
                   (lambda (status)
                     (yon-render yon-buffer
                                 'yon-render-catalog
                                 (yon-build-catalog (yon-get-and-parse-json)))))))
 
-(defun yon-refresh-thread (&optional buffer)
+(defun yon-refresh-buffer (&optional buffer)
   "Refreshes arbitrary buffer"
   (with-current-buffer (if buffer buffer (current-buffer))
     (funcall yon-refresh)))
