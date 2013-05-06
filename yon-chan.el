@@ -599,6 +599,14 @@ The header consists of the subject, author, timestamp, and post number."
                      'yon-render-thread
                      (yon-build-thread (yon-get-and-parse-json) yon-buffer)))))))
 
+(defun yon-chan-browse-board (board)
+  "Shows the specified board's catalog."
+  (interactive "MEnter board name you want to visit, e.g. `g': ")
+  (with-current-buffer (switch-to-buffer-other-window
+                        (generate-new-buffer (concat "*yon-chan-/" board "/*")))
+    (yon-chan-mode)
+    (yon-browse-board-catalog (current-buffer) board)))
+
 ;;;###autoload
 (defun yon-chan ()
   "Fetch and display 4chan boards."
