@@ -66,9 +66,7 @@ test</span>"))
                                 (com . "This is a light pole outside of my house. What do you think it&#039;s for?")
                                 (name . "OP")
                                 (now . "05/03/13(Fri)16:08")
-                                (no . 33511354))
-                              )
-
+                                (no . 33511354)))
                              (yon-build-post
                               '((images . 41)
                                 (replies . 113)
