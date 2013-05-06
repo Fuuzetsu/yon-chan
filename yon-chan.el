@@ -601,11 +601,15 @@ The header consists of the subject, author, timestamp, and post number."
 
 (defun yon-chan-browse-board (board)
   "Shows the specified board's catalog."
-  (interactive "MEnter board name you want to visit, e.g. `g': ")
-  (with-current-buffer (switch-to-buffer-other-window
-                        (generate-new-buffer (concat "*yon-chan-/" board "/*")))
-    (yon-chan-mode)
-    (yon-browse-board-catalog (current-buffer) board)))
+  (interactive "MEnter the board you wish to visit: ")
+  (let ((clean-board (if (string-match "/.+?/" board)
+                         (substring board 1 -1)
+                       board)))
+    (with-current-buffer (switch-to-buffer-other-window
+                          (generate-new-buffer (concat "*yon-chan-/"
+                                                       clean-board "/*")))
+      (yon-chan-mode)
+      (yon-browse-board-catalog (current-buffer) board))))
 
 ;;;###autoload
 (defun yon-chan ()
