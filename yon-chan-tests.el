@@ -40,73 +40,79 @@ test</span>"))
 
 (ert-deftest test-yon-build-catalog ()
   "Test that a simple catalog page is parsed properly."
-  (with-temp-buffer
-    (insert-file-contents "features/stubs/small-catalog.json")
-    (let* ((catalog (yon-build-catalog (yon-parse-json (buffer-string))))
-           (expected (list (yon-build-post
-                            '((images . 4)
-                              (replies . 43)
-                              (trip . "!!MJ4VbGu9hJd")
-                              (imagelimit . 0)
-                              (bumplimit . 0)
-                              (resto . 0)
-                              (fsize . 274881)
-                              (md5 . "37f6aLmlX3BiAteLJzmXwA==")
-                              (time . 1367611690.0)
-                              (tim . 1367611690801.0)
-                              (tn_h . 140)
-                              (tn_w . 250)
-                              (h . 1080)
-                              (w . 1920)
-                              (ext . ".jpg")
-                              (filename . "DSC00969")
-                              (com . "This is a light pole outside of my house. What do you think it&#039;s for?")
-                              (name . "OP")
-                              (now . "05/03/13(Fri)16:08")
-                              (no . 33511354))
-                            )
-
-                           (yon-build-post
-                            '((images . 41)
-                              (replies . 113)
-                              (trip . "!VIRGIN/FJM")
-                              (imagelimit . 0)
-                              (bumplimit . 0)
-                              (resto . 0)
-                              (fsize . 692993)
-                              (md5 . "ugTvIjLyKIEXfzh8z1EBWw==")
-                              (time . 1367608288.0)
-                              (tim . 1367608288151.0)
-                              (tn_h . 140)
-                              (tn_w . 250)
-                              (h . 768)
-                              (w . 1366)
-                              (ext . ".png")
-                              (filename . "destap")
-                              (com . "Refreshed page 8366 times, saw no desktop threads.  Posting a desktop thread using start_desktop_thread.sh")
-                              (sub . "desktop thread")
-                              (email . "neko")
-                              (name . "25 and")
-                              (now . "05/03/13(Fri)15:11")
-                              (no . 33510342)))))
-           (should (equalp catalog expected))))))
+  (let ((result-buffer (generate-new-buffer "ert-test-yon-render-catalog")))
+    (with-current-buffer result-buffer
+      (set (make-local-variable 'yon-current-board) "g"))
+    (with-temp-buffer
+      (insert-file-contents "features/stubs/small-catalog.json")
+      (let* ((catalog (yon-build-catalog (yon-parse-json (buffer-string)) result-buffer))
+             (expected (list (yon-build-post
+                              '((images . 4)
+                                (replies . 43)
+                                (trip . "!!MJ4VbGu9hJd")
+                                (imagelimit . 0)
+                                (bumplimit . 0)
+                                (resto . 0)
+                                (fsize . 274881)
+                                (md5 . "37f6aLmlX3BiAteLJzmXwA==")
+                                (time . 1367611690.0)
+                                (tim . 1367611690801.0)
+                                (tn_h . 140)
+                                (tn_w . 250)
+                                (h . 1080)
+                                (w . 1920)
+                                (ext . ".jpg")
+                                (filename . "DSC00969")
+                                (com . "This is a light pole outside of my house. What do you think it&#039;s for?")
+                                (name . "OP")
+                                (now . "05/03/13(Fri)16:08")
+                                (no . 33511354)))
+                             (yon-build-post
+                              '((images . 41)
+                                (replies . 113)
+                                (trip . "!VIRGIN/FJM")
+                                (imagelimit . 0)
+                                (bumplimit . 0)
+                                (resto . 0)
+                                (fsize . 692993)
+                                (md5 . "ugTvIjLyKIEXfzh8z1EBWw==")
+                                (time . 1367608288.0)
+                                (tim . 1367608288151.0)
+                                (tn_h . 140)
+                                (tn_w . 250)
+                                (h . 768)
+                                (w . 1366)
+                                (ext . ".png")
+                                (filename . "destap")
+                                (com . "Refreshed page 8366 times, saw no desktop threads.  Posting a desktop thread using start_desktop_thread.sh")
+                                (sub . "desktop thread")
+                                (email . "neko")
+                                (name . "25 and")
+                                (now . "05/03/13(Fri)15:11")
+                                (no . 33510342)))))
+             (should (equalp catalog expected)))))))
 
 ;; This test's formatting is weird to ensure all whitespace is preserved
 (ert-deftest test-yon-render-catalog ()
   "Test that a simple catalog page is rendered properly."
-  (with-temp-buffer
-    (insert-file-contents "features/stubs/small-catalog.json")
-    (let* ((catalog (yon-build-catalog (yon-parse-json (buffer-string)))))
-      (with-temp-buffer
-        (insert (yon-render-catalog catalog))
-        (should (string= (buffer-string)
-                         (concat "No subject - Anonymous - 05/03/13(Fri)10:16 - 33505434
+  (let ((result-buffer (generate-new-buffer "ert-test-yon-render-catalog")))
+    (with-current-buffer result-buffer
+      (set (make-local-variable 'yon-current-board) "g"))
+    (with-temp-buffer
+      (insert-file-contents "features/stubs/small-catalog.json")
+      (let* ((catalog (yon-build-catalog (yon-parse-json (buffer-string))
+                                         result-buffer)))
+        (with-current-buffer result-buffer
+          (yon-render-catalog catalog)
+          (should (string= (buffer-string)
+                           (concat "No subject - Anonymous - 05/03/13(Fri)10:16 - 33505434
 Anyone still using their Raspberry Pi or did you get bored? "
-                                 "
+                                   "
 
 What have you guys done with yours?
 No subject - Anonymous - 05/03/13(Fri)06:23 - 33502527
-Why haven't you joined the 144p master race yet /g/?")))))))
+Why haven't you joined the 144p master race yet /g/?
+"))))))))
 
 
 
@@ -132,16 +138,14 @@ Why haven't you joined the 144p master race yet /g/?")))))))
   (let ((orig "<a href=\"579850#p579850\" class=\"quotelink\">>>579850</a>
 meanwhile, test
 <a href=\"/g/res/33526840#p33526840\" class=\"quotelink\">>>>/g/3352
-6840</a>")
+6840</a>
+<a href=\"/pol/\" class=\"quotelink\">>>>/pol/</a>")
         (expected ">>579850
 meanwhile, test
->>>/g/33526840"))
-    (should (string= (with-temp-buffer
-                       (insert orig)
-                       (with-current-buffer (buffer-name)
-                         (set (make-local-variable 'yon-current-board) "q"))
-                       (yon-apply-quotelinks)
-                       (buffer-string))
+>>>/g/33526840
+>>>/pol/"))
+    (set (make-local-variable 'yon-current-board) "q")
+    (should (string= (yon-apply-quotelinks orig)
                      expected))))
 
 
@@ -158,10 +162,8 @@ Midline deadlink >>>/g/123456 endline
 more text
 midbroken >>>/g/64257533 deadlink
 end test"))
-    (with-temp-buffer
-      (insert input-text)
-      (yon-apply-deadlinks)
-      (should (string= result-text (buffer-string))))))
+    (set (make-local-variable 'yon-current-board) "g")
+    (should (string= result-text (yon-apply-deadlinks input-text)))))
 
 (ert-deftest test-yon-apply-greentext ()
   "Test that greentext is properly caught and substituted"
@@ -187,10 +189,8 @@ even more text
 >Multi track greentext!
 >
 end test"))
-    (with-temp-buffer
-      (insert input-text)
-      (yon-apply-greentext)
-      (should (string= result-text (buffer-string))))))
+    (set (make-local-variable 'yon-current-board) "g")
+    (should (string= result-text (yon-apply-greentext input-text)))))
 
 ;;; Formatting
 

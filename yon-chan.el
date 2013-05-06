@@ -29,14 +29,25 @@
 (require 'cl)
 
 ;;; Yon-chan mode
+(defgroup yon-chan nil
+  "Group used to store various yon-chan properties.")
+
+(defcustom yon-chan-mode-default-board nil
+  "The default board to visit when starting yon-chan"
+  :type 'string
+  :group 'yon-chan)
 
 (define-derived-mode yon-chan-mode
   special-mode "Yon-chan"
-  "4chan browser.")
+  "4chan browser."
+  (define-key yon-chan-mode-map (kbd "n") 'yon-jump-post-forward)
+  (define-key yon-chan-mode-map (kbd "p") 'yon-jump-post-backward)
+  (define-key yon-chan-mode-map (kbd "P") 'yon-jump-post-first)
+  (define-key yon-chan-mode-map (kbd "N") 'yon-jump-post-last)
+  (define-key yon-chan-mode-map (kbd "r") 'yon-refresh-buffer))
 
-;; (defun yon-mode-keys ()
-;;   "Set local key defs for yon-mode"
-;;   (define-key yon-mode-map "q" 'quit-window)
+(defvar yon-chan-mode-map (make-sparse-keymap)
+  "yon-chan-mode keymap")
 
 ;;; Faces
 
@@ -46,34 +57,40 @@
     (((class color) (min-colors 88) (background dark))  :foreground "green3")
     (((class color) (min-colors 16) (background dark))  :foreground "green3")
     (((class color)) :foreground "green3"))
-  "Basic greentext face for all the implications we can imply.")
+  "Basic greentext face for all the implications we can imply."
+  :group 'yon-chan)
 
 (defface yon-face-post-author
   '((default :weight bold)
     (((class color) (min-colors 16) (background light)) :foreground "purple4")
     (((class color) (min-colors 16) (background dark))  :foreground "purple2")
     (((class color)) :foreground "purple"))
-  "Basic face for the post author.")
+  "Basic face for the post author."
+  :group 'yon-chan)
 
 (defface yon-face-post-subject
   '((default :weight bold)
     (((class color)) :foreground "brown"))
-  "Basic face for the post subject.")
+  "Basic face for the post subject."
+  :group 'yon-chan)
 
 (defface yon-face-post-number
   '((default :weight bold)
     (((class color)) :foreground "red3"))
-  "Basic face for the post number.")
+  "Basic face for the post number."
+  :group 'yon-chan)
 
 (defface yon-face-post-number-link
   '((default :weight bold :underline t)
     (((class color)) :foreground "red3"))
-  "Basic face for the post number.")
+  "Basic face for the post number."
+  :group 'yon-chan)
 
 (defface yon-face-deadlink
   '((default :strike-through t)
     (((class color)) :foreground "red2"))
-  "Basic face for dead cross-links.")
+  "Basic face for dead cross-links."
+  :group 'yon-chan)
 
 ;;; Comment sanitization and processing
 
@@ -108,7 +125,8 @@
 ;; Interactive for now for testing
 (defun yon-possibly-colorify-line-by-tags
   (opregex endregex colourface &optional newline)
-  "Least elegant function that will replace quotes with greentext."
+  "Applies colourface to anything between opregex and endregex.
+If newline is non-nil, newlines in the matching text will be removed."
   (interactive)
   (let ((start (string-match opregex (yon-get-line-content)))
         (op opregex)
@@ -137,7 +155,8 @@
 
 
 (defun yon-make-quote-buttons ()
-  (let* ((start (string-match "<a href=\".*?\" class=\"quotelink\">" (yon-get-line-content)))
+  (let* ((start (string-match "<a href=\".*?\" class=\"quotelink\">"
+                              (yon-get-line-content)))
          (op "<a href\"")
          (ed  "</a>"))
     (when start
@@ -207,53 +226,74 @@
                         (insert-text-button (yon-strip-newlines (cadr split-cont))
                                             'face 'yon-face-post-number-link
                                             'keymap kmap))))
-                (lexical-let ((thread (car link))
-                              (post (cadr link)) ;; for future use, post jumping
-                              (kmap (make-sparse-keymap))
-                              (board (with-current-buffer (buffer-name)
-                                       yon-current-board)))
-                  (define-key kmap (kbd "<return>")
-                    (lambda ()
-                      (interactive)
-                      (yon-browse-thread
-                       (switch-to-buffer-other-window
-                        (generate-new-buffer
-                         (concat "*yon-chan-/" board "/-" thread)))
-                       board thread)))
-                  (insert-text-button (yon-strip-newlines (cadr split-cont))
-                                      'face 'yon-face-post-number-link
-                                      'keymap kmap))))))))))
+                (if (equal 1 (length link)) ;; simple link such as >>>/a/
+                    (lexical-let ((board (car link))
+                                  (kmap (make-sparse-keymap)))
+                      (define-key kmap (kbd "<return>")
+                        (lambda ()
+                          (interactive)
+                          (yon-browse-board-catalog
+                           (switch-to-buffer-other-window
+                            (generate-new-buffer
+                             (concat "*yon-chan-/" board "/*")))
+                           (substring board 1 (- (length board) 1)))))
+                      (insert-text-button (yon-strip-newlines (cadr split-cont))
+                                          'face 'yon-face-post-number-link
+                                          'keymap kmap)
+                      )
+                  (lexical-let ((thread (car link))
+                                (post (cadr link))
+                                (kmap (make-sparse-keymap))
+                                (board (with-current-buffer (buffer-name)
+                                         yon-current-board)))
+                    (define-key kmap (kbd "<return>")
+                      (lambda ()
+                        (interactive)
+                        (yon-jump-to-local-post (string-to-number post))))
+                    (insert-text-button (yon-strip-newlines (cadr split-cont))
+                                        'face 'yon-face-post-number-link
+                                        'keymap kmap)))))))))))
 
-(defun yon-apply-deadlinks ()
+(defun yon-apply-deadlinks (text)
   "Checks each line for deadlink replacement."
   (save-excursion
-    (goto-char (point-min))
-    (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
-                              "<span class=\"deadlink\">" "</span>"
-                              'yon-face-deadlink t)
-             (forward-line 1))))
+    (lexical-let ((board (with-current-buffer (current-buffer)
+                           yon-current-board)))
+      (with-temp-buffer
+        (set (make-local-variable 'yon-current-board) board)
+        (insert text)
+        (goto-char (point-min))
+        (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
+                                  "<span class=\"deadlink\">" "</span>"
+                                  'yon-face-deadlink t)
+                 (forward-line 1))
+        (buffer-string)))))
 
-(defun yon-apply-greentext ()
+(defun yon-apply-greentext (text)
   "Checks each line for greentext replacement."
   (save-excursion
-    (goto-char (point-min))
-    (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
-                              "<span class=\"quote\">" "</span>"
-                              'yon-face-greentext t)
-             (forward-line 1))))
+    (lexical-let ((board (with-current-buffer (current-buffer)
+                           yon-current-board)))
+      (with-temp-buffer
+        (set (make-local-variable 'yon-current-board) board)
+        (insert text)
+        (goto-char (point-min))
+        (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
+                                  "<span class=\"quote\">" "</span>"
+                                  'yon-face-greentext t)
+                 (forward-line 1))
+        (buffer-string)))))
 
-(defun yon-apply-quotelinks ()
-  (goto-char (point-min))
-  (cl-loop until (eobp) do (yon-make-quote-buttons) (forward-line 1)))
-
-
-
-;; Interactive for now for testing
-(defun yon-possibly-greenify-line ()
-  "Least elegant function that will replace quotes with greentext."
-  (interactive)
-  (let ((op "<span class=\"quote\">")
-        (ed "</span>"))))
+(defun yon-apply-quotelinks (text)
+  (save-excursion
+    (lexical-let ((board (with-current-buffer (current-buffer)
+                           yon-current-board)))
+      (with-temp-buffer
+        (set (make-local-variable 'yon-current-board) board)
+        (insert text)
+        (goto-char (point-min))
+        (cl-loop until (eobp) do (yon-make-quote-buttons) (forward-line 1))
+        (buffer-string)))))
 
 (defun yon-strip-newlines (body)
   (replace-regexp-in-string "\n" "" body))
@@ -297,7 +337,7 @@
   filename replyto sticky closed time trip id capcode country
   country_name email ext fsize md5 image_w image_h thumbnail_w thumbnail_h
   filedeleted spoiler custom_spoiler omitted_posts omitted_images replies
-  images bumplimit imagelimit new_filename)
+  images bumplimit imagelimit new_filename renderpos)
 
 (defun yon-build-post (response)
   "Builds a post object from deserialized JSON response."
@@ -333,45 +373,65 @@
                  :replies        (yon-elem response 'replies)
                  :images         (yon-elem response 'images)
                  :bumplimit      (yon-elem response 'bumplimit)
-                 :imagelimit     (yon-elem response 'imagelimit)))
+                 :imagelimit     (yon-elem response 'imagelimit)
+                 :renderpos      '()))
 
-(defun yon-build-thread (response)
-  (mapcar 'yon-build-post (yon-elem response 'posts)))
 
-(defun yon-build-catalog (response)
-  (mapcar 'yon-build-page response))
+(defun yon-build-thread (response buffer)
+  (with-current-buffer buffer
+    (set (make-local-variable 'yon-buffer-posts)
+         (mapcar 'yon-build-post (yon-elem response 'posts)))))
+
+(defun flatten(x)
+  (cond ((null x) nil)
+    ((listp x) (append (flatten (car x)) (flatten (cdr x))))
+    (t (list x))))
+
+(defun yon-build-catalog (response buffer)
+  (with-current-buffer buffer
+    (let ((pages (mapcar 'yon-build-page response)))
+      (set (make-local-variable 'yon-buffer-posts) (flatten pages))
+      pages)))
 
 (defun yon-build-page (response)
   (mapcar 'yon-build-post (yon-elem response 'threads)))
 
 ;;; Rendering
 
-(defun yon-apply-faces ()
-  (yon-apply-greentext)
-  (yon-apply-deadlinks)
-  (yon-apply-quotelinks))
+(defmacro $. (f g x)
+  `(,f (,g ,x)))
+
+(defun yon-apply-faces (text)
+  ($. yon-apply-quotelinks
+      yon-apply-deadlinks
+      (yon-apply-greentext text)))
 
 (defun yon-render (buffer proc obj)
   (with-current-buffer buffer
     (setq buffer-read-only nil)
-    (insert (funcall proc obj))
-    (yon-apply-faces)
+    (funcall proc obj)
     (setq buffer-read-only t)
     (goto-char (point-min))))
 
 (defun yon-render-catalog (catalog)
-  (mapconcat 'yon-render-catalog-page catalog "\n"))
+  (mapc 'yon-render-catalog-page catalog))
 
 (defun yon-render-catalog-page (page)
-  (mapconcat 'yon-format-post page "\n"))
+  (dolist (post page)
+    (setf (yon-post-renderpos post) (point))
+    (insert (concat (yon-apply-faces (yon-format-post post)) "\n"))))
 
 (defun yon-render-thread (posts)
   (let ((op (car posts))
         (replies (cdr posts)))
-    (concat (yon-format-post op) "\n"
-            (mapconcat (lambda (x) (replace-regexp-in-string ;; for now
-                                    "^" "    "
-                                    (yon-format-post x))) replies "\n"))))
+    (setf (yon-post-renderpos op) (point))
+    (insert (yon-apply-faces (concat (yon-format-post op))) "\n")
+    (dolist (post replies)
+      (setf (yon-post-renderpos post) (point))
+      (insert
+       (concat (yon-apply-faces
+                (replace-regexp-in-string "^" "    "
+                                          (yon-format-post post))) "\n")))))
 
 ;;; Formatting
 
@@ -434,35 +494,147 @@ The header consists of the subject, author, timestamp, and post number."
           (buffer-string))
       (propertize post-number 'face 'yon-face-post-number))))
 
+
+(defun yon-jump-posts (amount)
+  "Jumps `amount' of posts. Can be negative."
+  (let* ((posts (with-current-buffer (current-buffer) yon-buffer-posts))
+
+         (sorted-posts (sort yon-buffer-posts
+                             (lambda (x y)
+                               ;; This currently is just a safety measure,
+                               ;; they should be presorted for now.
+                               "Sorts posts based on their render position."
+                               (< (yon-post-renderpos x)
+                                  (yon-post-renderpos y)))))
+         (closest-post-index
+          (let ((closest (yon-post-renderpos (car posts)))
+                (index 0))
+            (dotimes (idx (length sorted-posts)) ;; it's like I'm really writing C!
+              (let ((rp (yon-post-renderpos (nth idx sorted-posts))))
+                (when (> (abs (- (point) closest)) (abs (- (point) rp)))
+                  (setq closest rp)
+                  (setq index idx))))
+            index))
+         (new-idx (+ closest-post-index amount)))
+    (if (< new-idx 0)
+        (yon-jump-to-local-post (yon-post-number (nth 0 sorted-posts)))
+      (if (>= new-idx (length sorted-posts))
+          (yon-jump-to-local-post (yon-post-number (car (last sorted-posts))))
+        (yon-jump-to-local-post (yon-post-number (nth new-idx sorted-posts)))))))
+
+(defun yon-jump-to-local-post (number)
+  (let ((render-place))
+    (dolist (post (with-current-buffer (current-buffer) yon-buffer-posts))
+      (when (equal number (yon-post-number post))
+        (setq render-place (yon-post-renderpos post))))
+    (if render-place
+        (progn
+          (goto-char render-place)
+          (recenter-top-bottom 0)) ;; I'm not too sure about this
+      (message "Could not find post %s to jump to." (number-to-string number)))))
+
+(defun yon-jump-to-nth (n)
+  "Jumps to nth post. Negative n gives first post too high n gives last post."
+  (let ((sorted-posts (sort yon-buffer-posts
+                            (lambda (x y)
+                              ;; This currently is just a safety measure,
+                              ;; they should be presorted for now.
+                              "Sorts posts based on their render position."
+                              (< (yon-post-renderpos x)
+                                 (yon-post-renderpos y))))))
+    (cond
+     ((< n 0) (yon-jump-to-local-post (yon-post-number (nth 0 sorted-posts))))
+     ((> n (- (length sorted-posts) 1))
+           (yon-jump-to-local-post
+            (yon-post-number (nth (- (length sorted-posts) 1) sorted-posts))))
+     (t (yon-jump-to-local-post (yon-post-number (nth n sorted-posts)))))))
+
+(defun yon-jump-post-forward (&optional number)
+  "Jump backward one post. Jump forward `n' posts if given an argument."
+  (interactive "p")
+  (yon-jump-posts number))
+
+(defun yon-jump-post-backward (&optional number)
+  "Jump backward one post. Jump backward `n' posts if given an argument."
+  (interactive "p")
+  (yon-jump-posts (* -1 number)))
+
+(defun yon-jump-post-first ()
+  "Jump to first post on the page."
+  (interactive)
+  (yon-jump-to-nth 0))
+
+(defun yon-jump-post-last ()
+  "Jump to last post on the page."
+  (interactive)
+  (yon-jump-to-nth (- (length yon-buffer-posts) 1)))
+
+
 (defun yon-browse-board-catalog (buffer board)
   (url-retrieve (concat "http://api.4chan.org/" board "/catalog.json")
-                (lexical-let ((yon-buffer buffer))
+                (lexical-let ((yon-buffer buffer)
+                              (board-l board))
                   (with-current-buffer yon-buffer
-                    (set (make-local-variable 'yon-current-board) board))
-                  (lambda (status)
-                    (yon-render yon-buffer
-                                'yon-render-catalog
-                                (yon-build-catalog (yon-get-and-parse-json)))))))
+                    (yon-chan-mode)
+                    (set (make-local-variable 'yon-current-board) board)
+                    (set (make-local-variable 'yon-refresh)
+                         (lambda ()
+                           "Function called when we want to refresh the catalog"
+                           (yon-browse-board-catalog yon-buffer board-l)))
+                    (lambda (status)
+                      (yon-render yon-buffer
+                                  'yon-render-catalog
+                                  (yon-build-catalog (yon-get-and-parse-json)
+                                                     yon-buffer)))))))
+
+(defun yon-refresh-buffer (&optional buffer)
+  "Refreshes arbitrary buffer"
+  (interactive)
+  (with-current-buffer (if buffer buffer (current-buffer))
+    (funcall yon-refresh)))
 
 (defun yon-browse-thread (buffer board thread-number)
   (url-retrieve
    (concat "http://api.4chan.org/" board "/res/" thread-number ".json")
-   (lexical-let ((yon-buffer buffer))
-     (with-current-buffer buffer
-       (set (make-local-variable 'yon-current-board) board))
-     (lambda (status)
-       (yon-render yon-buffer
-                   'yon-render-thread
-                   (yon-build-thread (yon-get-and-parse-json)))))))
+   (lexical-let ((yon-buffer buffer)
+                 (board-l board)
+                 (thread-number-l thread-number))
+     (with-current-buffer yon-buffer
+       (yon-chan-mode)
+       (set (make-local-variable 'yon-current-board) board)
+       (set (make-local-variable 'yon-refresh)
+            (lambda ()
+              "Function called when we want to refresh the whole thread"
+              (yon-browse-thread yon-buffer board-l thread-number-l)))
+       (lambda (status)
+         (yon-render yon-buffer
+                     'yon-render-thread
+                     (yon-build-thread (yon-get-and-parse-json) yon-buffer)))))))
+
+(defun yon-chan-browse-board (board)
+  "Shows the specified board's catalog."
+  (interactive "MEnter the board you wish to visit: ")
+  (let ((clean-board (if (string-match "/.+?/" board)
+                         (substring board 1 -1)
+                       board)))
+    (with-current-buffer (switch-to-buffer-other-window
+                          (generate-new-buffer (concat "*yon-chan-/"
+                                                       clean-board "/*")))
+      (yon-chan-mode)
+      (yon-browse-board-catalog (current-buffer) board))))
 
 ;;;###autoload
 (defun yon-chan ()
   "Fetch and display 4chan boards."
   (interactive)
-  (with-current-buffer (switch-to-buffer-other-window
-                        (generate-new-buffer "*yon-chan*"))
-    (yon-chan-mode)
-    (yon-browse-board-catalog (current-buffer) "g")))
+  (if yon-chan-mode-default-board
+      (with-current-buffer (switch-to-buffer-other-window
+                            (generate-new-buffer
+                             (concat "*yon-chan-/"
+                                     yon-chan-mode-default-board "/*")))
+        (yon-chan-mode)
+        (yon-browse-board-catalog (current-buffer) yon-chan-mode-default-board))
+    (call-interactively 'yon-chan-browse-board)))
 
 
 (provide 'yon-chan)
