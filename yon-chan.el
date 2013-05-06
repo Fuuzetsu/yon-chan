@@ -29,6 +29,8 @@
 (require 'cl)
 
 ;;; Yon-chan mode
+(defgroup yon-chan nil
+  "Group used to store various yon-chan properties.")
 
 (defcustom yon-chan-mode-default-board nil
   "The default board to visit when starting yon-chan"
@@ -47,7 +49,6 @@
 (defvar yon-chan-mode-map (make-sparse-keymap)
   "yon-chan-mode keymap")
 
-
 ;;; Faces
 
 (defface yon-face-greentext
@@ -56,34 +57,40 @@
     (((class color) (min-colors 88) (background dark))  :foreground "green3")
     (((class color) (min-colors 16) (background dark))  :foreground "green3")
     (((class color)) :foreground "green3"))
-  "Basic greentext face for all the implications we can imply.")
+  "Basic greentext face for all the implications we can imply."
+  :group 'yon-chan)
 
 (defface yon-face-post-author
   '((default :weight bold)
     (((class color) (min-colors 16) (background light)) :foreground "purple4")
     (((class color) (min-colors 16) (background dark))  :foreground "purple2")
     (((class color)) :foreground "purple"))
-  "Basic face for the post author.")
+  "Basic face for the post author."
+  :group 'yon-chan)
 
 (defface yon-face-post-subject
   '((default :weight bold)
     (((class color)) :foreground "brown"))
-  "Basic face for the post subject.")
+  "Basic face for the post subject."
+  :group 'yon-chan)
 
 (defface yon-face-post-number
   '((default :weight bold)
     (((class color)) :foreground "red3"))
-  "Basic face for the post number.")
+  "Basic face for the post number."
+  :group 'yon-chan)
 
 (defface yon-face-post-number-link
   '((default :weight bold :underline t)
     (((class color)) :foreground "red3"))
-  "Basic face for the post number.")
+  "Basic face for the post number."
+  :group 'yon-chan)
 
 (defface yon-face-deadlink
   '((default :strike-through t)
     (((class color)) :foreground "red2"))
-  "Basic face for dead cross-links.")
+  "Basic face for dead cross-links."
+  :group 'yon-chan)
 
 ;;; Comment sanitization and processing
 
