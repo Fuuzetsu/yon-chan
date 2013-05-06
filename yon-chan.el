@@ -30,6 +30,11 @@
 
 ;;; Yon-chan mode
 
+(defcustom yon-chan-mode-default-board nil
+  "The default board to visit when starting yon-chan"
+  :type 'string
+  :group 'yon-chan)
+
 (define-derived-mode yon-chan-mode
   special-mode "Yon-chan"
   "4chan browser."
@@ -615,10 +620,14 @@ The header consists of the subject, author, timestamp, and post number."
 (defun yon-chan ()
   "Fetch and display 4chan boards."
   (interactive)
-  (with-current-buffer (switch-to-buffer-other-window
-                        (generate-new-buffer "*yon-chan*"))
-    (yon-chan-mode)
-    (yon-browse-board-catalog (current-buffer) "q")))
+  (if yon-chan-mode-default-board
+      (with-current-buffer (switch-to-buffer-other-window
+                            (generate-new-buffer
+                             (concat "*yon-chan-/"
+                                     yon-chan-mode-default-board "/*")))
+        (yon-chan-mode)
+        (yon-browse-board-catalog (current-buffer) yon-chan-mode-default-board))
+    (call-interactively 'yon-chan-browse-board)))
 
 
 (provide 'yon-chan)
