@@ -26,7 +26,7 @@
 ;;; Code:
 
 (require 'json)
-(require 'cl)
+(require 'cl-lib)
 
 ;;; Yon-chan mode
 (defgroup yon-chan nil
