@@ -2,7 +2,10 @@ language: emacs-lisp
 notifications:
   email:
     on_success: never
-    on_failure: always
+    on_failure: change
+  irc:
+    channels:
+      - "irc.freenode.net#fuuzetsu"
 before_install:
   - if [ "$EMACS" = 'emacs-snapshot' ]; then
       sudo add-apt-repository -y ppa:cassou/emacs &&
