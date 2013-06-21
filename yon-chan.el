@@ -277,36 +277,28 @@ If newline is non-nil, newlines in the matching text will be removed."
                  (forward-line 1))
         (buffer-string)))))
 
+(defmacro yon-apply-face-between-regex (text face oprx endrx nl)
+  "Macro that generalises face application between regex delimiters."
+  `(save-excursion
+    (lexical-let ((board (with-current-buffer (current-buffer)
+                           yon-current-board)))
+      (with-temp-buffer
+        (set (make-local-variable 'yon-current-board) board)
+        (insert ,text)
+        (goto-char (point-min))
+        (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
+                                  ,oprx ,endrx ,face ,nl)
+                 (forward-line 1))
+        (buffer-string)))))
+
 (defun yon-apply-greentext (text)
   "Checks each line for greentext replacement."
-  (save-excursion
-    (lexical-let ((board (with-current-buffer (current-buffer)
-                           yon-current-board)))
-      (with-temp-buffer
-        (set (make-local-variable 'yon-current-board) board)
-        (insert text)
-        (goto-char (point-min))
-        (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
-                                  "<span class=\"quote\">" "</span>"
-                                  'yon-face-greentext t)
-                 (forward-line 1))
-        (buffer-string)))))
+  (yon-apply-face-between-regex
+   text 'yon-face-greentext "<span class=\"quote\">" "</span>" t))
 
 (defun yon-apply-prettyprint (text)
-  "Gets rid of those ugly prettyprint tags"
-  (save-excursion
-    (lexical-let ((board (with-current-buffer (current-buffer)
-                           yon-current-board)))
-      (with-temp-buffer
-        (set (make-local-variable 'yon-current-board) board)
-        (insert text)
-        (goto-char (point-min))
-        (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
-                                  "<pre class=\"prettyprint\">" "</pre>"
-                                  'yon-face-prettyprint nil)
-                 (forward-line 1))
-        (buffer-string)))))
-
+  (yon-apply-face-between-regex
+   text 'yon-face-prettyprint "<pre class=\"prettyprint\">" "</pre>" nil))
 
 (defun yon-apply-quotelinks (text)
   (save-excursion
