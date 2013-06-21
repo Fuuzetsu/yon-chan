@@ -60,6 +60,14 @@
   "Basic greentext face for all the implications we can imply."
   :group 'yon-chan)
 
+(defface yon-face-prettyprint
+  '((default)
+    (((class color) (min-colors 16) (background light)) :foreground "grey21")
+    (((class color) (min-colors 16) (background dark))  :foreground "pink2")
+    (((class color)) :foreground "grey21"))
+  "Basic face for prettyprint blocks. Colour picked aribtrarily."
+  :group 'yon-chan)
+
 (defface yon-face-post-author
   '((default :weight bold)
     (((class color) (min-colors 16) (background light)) :foreground "purple4")
@@ -284,6 +292,22 @@ If newline is non-nil, newlines in the matching text will be removed."
                  (forward-line 1))
         (buffer-string)))))
 
+(defun yon-apply-prettyprint (text)
+  "Gets rid of those ugly prettyprint tags"
+  (save-excursion
+    (lexical-let ((board (with-current-buffer (current-buffer)
+                           yon-current-board)))
+      (with-temp-buffer
+        (set (make-local-variable 'yon-current-board) board)
+        (insert text)
+        (goto-char (point-min))
+        (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
+                                  "<pre class=\"prettyprint\">" "</pre>"
+                                  'yon-face-prettyprint nil)
+                 (forward-line 1))
+        (buffer-string)))))
+
+
 (defun yon-apply-quotelinks (text)
   (save-excursion
     (lexical-let ((board (with-current-buffer (current-buffer)
@@ -294,6 +318,7 @@ If newline is non-nil, newlines in the matching text will be removed."
         (goto-char (point-min))
         (cl-loop until (eobp) do (yon-make-quote-buttons) (forward-line 1))
         (buffer-string)))))
+
 
 (defun yon-strip-newlines (body)
   (replace-regexp-in-string "\n" "" body))
@@ -404,7 +429,8 @@ If newline is non-nil, newlines in the matching text will be removed."
 (defun yon-apply-faces (text)
   ($. yon-apply-quotelinks
       yon-apply-deadlinks
-      (yon-apply-greentext text)))
+      ($. yon-apply-greentext
+          yon-apply-prettyprint text)))
 
 (defun yon-render (buffer proc obj)
   (with-current-buffer buffer
