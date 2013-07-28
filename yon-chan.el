@@ -231,6 +231,14 @@ If newline is non-nil, newlines in the matching text will be removed."
                               (generate-new-buffer
                                (concat "*yon-chan-/" board "/-" thread)))
                              board thread)))
+                        (define-key kmap (kbd "a")
+                          (lambda ()
+                            (interactive)
+                            (yon-browse-thread
+                             (with-current-buffer
+                                 (rename-buffer (concat "*yon-chan-/" board "/-" thread))
+                               (current-buffer))
+                             board thread)))
                         (insert-text-button (yon-strip-newlines (cadr split-cont))
                                             'face 'yon-face-post-number-link
                                             'keymap kmap))))
@@ -244,6 +252,14 @@ If newline is non-nil, newlines in the matching text will be removed."
                            (switch-to-buffer-other-window
                             (generate-new-buffer
                              (concat "*yon-chan-/" board "/*")))
+                           (substring board 1 (- (length board) 1)))))
+                      (define-key kmap (kbd "a")
+                        (lambda ()
+                          (interactive)
+                          (yon-browse-board-catalog
+                           (with-current-buffer
+                               (rename-buffer (concat "*yon-chan-/" board "/*"))
+                             (current-buffer))
                            (substring board 1 (- (length board) 1)))))
                       (insert-text-button (yon-strip-newlines (cadr split-cont))
                                           'face 'yon-face-post-number-link
@@ -504,6 +520,14 @@ The header consists of the subject, author, timestamp, and post number."
          (switch-to-buffer-other-window
           (generate-new-buffer
            (concat "*yon-chan-/" board "/-" post-number)))
+         board post-number)))
+    (define-key kmap (kbd "a")
+      (lambda ()
+        (interactive)
+        (yon-browse-thread
+         (with-current-buffer
+             (rename-buffer (concat "*yon-chan-/" board "/-" post-number))
+           (current-buffer))
          board post-number)))
     (if (and op board)
         (with-temp-buffer
