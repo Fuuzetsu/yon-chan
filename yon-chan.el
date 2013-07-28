@@ -427,6 +427,7 @@ If newline is non-nil, newlines in the matching text will be removed."
 (defun yon-render (buffer proc obj)
   (with-current-buffer buffer
     (setq buffer-read-only nil)
+    (erase-buffer)
     (funcall proc obj)
     (setq buffer-read-only t)
     (goto-char (point-min))))
