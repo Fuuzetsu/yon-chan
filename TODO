@@ -1,0 +1,28 @@
+# -*- org -*-
+
+* Things To Do
+
+** TODO Browsing
+*** TODO Navigation
+**** TODO Post hiding
+**** TODO Temporary/inline
+**** TODO Permanent purge post ID
+**** TODO Post filtering
+**** TODO Hook for user specified filtering functions
+**** TODO Some default filters
+**** TODO Display thumbnails
+*** TODO Images
+     Provide various image related functions
+**** TODO Inline enlarge
+**** TODO Customisable size &c
+**** TODO Separate buffer image viewing
+**** TODO Customisable size &c
+**** TODO Image saving
+** TODO Posting
+*** TODO Text posting
+*** TODO Image posting
+*** TODO Pass support for captcha skipping
+** TODO README
+*** TODO Key overview
+*** TODO Usage examples
+*** TODO Hook examples
