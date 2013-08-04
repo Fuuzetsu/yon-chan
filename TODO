@@ -12,10 +12,11 @@
 **** TODO Some default filters
 **** TODO Display thumbnails
 *** TODO Images
-     Provide various image related functions
 **** TODO Inline enlarge
 **** TODO Customisable size &c
 **** TODO Separate buffer image viewing
+***** TODO Two buffers alongside each other one with posts other with images
+      Think thumbnails + full buffer with image in image-dired-mode
 **** TODO Customisable size &c
 **** TODO Image saving
 ** TODO Posting
@@ -26,3 +27,15 @@
 *** TODO Key overview
 *** TODO Usage examples
 *** TODO Hook examples
+** TODO Test suite
+*** TODO Test user interface elements
+**** TODO Decouple the JSON caller a bit so it's easier to test against
+**** TODO Navigation tests
+**** TODO Face colorisation
+**** TODO Post filtering tests
+**** TODO Image tests
+***** TODO Resizing
+***** TODO Saving
+***** TODO Hiding
+**** TODO Posting tests
+***** TODO System where we can test that sent off data is correct (non-trivial)
