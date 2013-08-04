@@ -1,6 +1,7 @@
 ;;; yon-chan.el --- A 4chan browser for Emacs
 
 ;; Copyright (C) 2013  David Thompson
+;;           (C) 2013  Mateusz Kowalczyk
 
 ;; Author: David Thompson <dthompson@member.fsf.org>
 ;; Keywords: hypermedia, games
