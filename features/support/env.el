@@ -21,16 +21,15 @@
 
 
 (Setup
- ;; Before anything has run
+;; before all tests
  )
 
 (Before
- (erase-buffer)
- )
+ (switch-to-buffer
+  (get-buffer-create "*testing-buffer*")))
 
 (After
- ;; After each scenario is run
- )
+ (kill-buffer))
 
 (Teardown
  ;; After when everything has been run
