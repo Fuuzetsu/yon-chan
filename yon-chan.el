@@ -541,7 +541,28 @@ The header consists of the subject, author, timestamp, and post number."
 
 (defun yon-format-post-image (post)
   (if (yon-post-extension post)
-      (concat (yon-post-filename post) (yon-post-extension post))
+      (lexical-let ((kmap (make-sparse-keymap))
+                    (board (with-current-buffer (buffer-name)
+                             (when (boundp 'yon-current-board)
+                               yon-current-board)))
+                    (extension (yon-post-extension post))
+                    (filename (yon-post-filename post))
+                    (new-filename (number-to-string
+                                   (yon-post-new-filename post))))
+        (define-key kmap (kbd "<return>")
+          (lambda ()
+            (interactive)
+            (display-image-other-window
+             (concat "http://images.4chan.org/"
+                     board
+                     "/src/"
+                     new-filename
+                     extension)
+             (concat filename extension))))
+        (with-temp-buffer
+          (insert-text-button (concat filename extension)
+                              'keymap kmap)
+          (buffer-string)))
     ""))
 
 (defun yon-format-post-number (post)
@@ -576,6 +597,25 @@ The header consists of the subject, author, timestamp, and post number."
           (buffer-string))
       (propertize post-number 'face 'yon-face-post-number))))
 
+;;;
+;;; Actions
+;;;
+
+(defun display-image-other-window (url name)
+  (lexical-let ((name name))
+    (url-retrieve
+     url
+     (lambda (status)
+       (rename-buffer name t)
+       ;; Delete HTTP header
+       (re-search-forward "\r?\n\r?\n")
+       (delete-region (point-min) (point))
+       (image-mode)
+       (switch-to-buffer-other-window (buffer-name))))))
+
+;;;
+;;; Navigation
+;;;
 
 (defun yon-jump-posts (amount)
   "Jumps `amount' of posts. Can be negative."
