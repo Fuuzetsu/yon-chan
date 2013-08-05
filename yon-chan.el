@@ -537,7 +537,10 @@ The header consists of the subject, author, timestamp, and post number."
   "Returns an html-cleaned timestamp string."
   (yon-clean-html-string (yon-post-timestamp post)))
 
-(defun yon-format-post-image)
+(defun yon-format-post-image (post)
+  (if (yon-post-extension post)
+      (concat (yon-post-filename post) (yon-post-extension post))
+    ""))
 
 (defun yon-format-post-number (post)
   "Returns the post number. Clickable if it's a thread OP."
