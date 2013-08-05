@@ -46,7 +46,10 @@
   :type 'string
   :group 'yon-chan)
 
-(defvar yon-api-url "http://api.4chan.org/")
+(defcustom yon-api-url "http://api.4chan.org/"
+  "The 4chan API URL."
+  :type 'string
+  :group 'yon-chan)
 
 (define-derived-mode yon-chan-mode
   special-mode "Yon-chan"
