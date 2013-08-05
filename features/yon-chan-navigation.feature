@@ -60,7 +60,7 @@ Feature: Moving between posts in yon-chan thread view
 
   Scenario: Trying to jump out of bounds up
     When I render "small-thread.json" as "/g/"
-    When I go to point "40"
+    When I go to end of buffer
     And I press "C-u 100 p"
     Then the cursor should be on line "1"
     And I press "C-u 100 n"
