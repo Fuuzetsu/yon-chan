@@ -737,9 +737,21 @@ The header consists of the subject, author, timestamp, and post number."
                      'yon-render-thread
                      (yon-build-thread (yon-get-and-parse-json) yon-buffer)))))))
 
+(defcustom yon-chan-boards
+  '("/a/" "/b/" "/c/" "/d/" "/e/" "/f/" "/g/" "/gif/" "/h/" "/hr/"
+    "/k/" "/m/" "/o/" "/p/" "/r/" "/s/" "/t/" "/u/" "/v/" "/vg/"
+    "/vr/" "/w/" "/wg/" "/i/" "/ic/" "/r9k/" "/s4s/" "/cm/" "/hm/"
+    "/lgbt/" "/y/" "/3/" "/adv/" "/an/" "/asp/" "/cgl/" "/ck/" "/co/"
+    "/diy/" "/fa/" "/fit/" "/gd/" "/hc/" "/int/" "/jp/" "/lit/"
+    "/mlp/" "/mu/" "/n/" "/out/" "/po/" "/pol/" "/sci/" "/soc/" "/sp/"
+    "/tg/" "/toy/" "/trv/" "/tv/" "/vp/" "/wsg/" "/x/" "/q/")
+  "The list of available 4chan boards"
+  :type 'list
+  :group 'yon-chan)
+
 (defun yon-chan-browse-board (board)
   "Shows the specified board's catalog."
-  (interactive "MEnter the board you wish to visit: ")
+  (interactive (list (completing-read "Enter the board you wish to visit: " yon-chan-boards)))
   (let ((clean-board (if (string-match "/.+?/" board)
                          (substring board 1 -1)
                        board)))
