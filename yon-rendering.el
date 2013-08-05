@@ -31,7 +31,7 @@
     (((class color) (min-colors 16) (background light)) :foreground "ForestGreen")
     (((class color) (min-colors 88) (background dark))  :foreground "green3")
     (((class color) (min-colors 16) (background dark))  :foreground "green3")
-    (((class color)) :foreground "green3"))
+    (((class color)) :foreground "green"))
   "Basic greentext face for all the implications we can imply."
   :group 'yon-chan)
 
