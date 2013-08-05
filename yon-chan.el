@@ -510,12 +510,14 @@ If newline is non-nil, newlines in the matching text will be removed."
 (defun yon-format-post-header (post)
   "Returns a formatted string representation of a post header.
 The header consists of the subject, author, timestamp, and post number."
-  (format "%s - %s - %s - %s"
-          (yon-format-post-subject post)
-          (yon-format-post-author post)
-          (yon-format-post-timestamp post)
-          (yon-format-post-number post)
-          (yon-format-post-image post)))
+  (lexical-let ((items (list (yon-format-post-subject post)
+                             (yon-format-post-author post)
+                             (yon-format-post-timestamp post)
+                             (yon-format-post-number post)
+                             (yon-format-post-image post)))))
+  ;; Some header items could be blank (such as the image filename), so
+  ;; remove all nil values.
+  (json-join  (remq nil items) " - "))
 
 (defun yon-format-post-comment (post)
   "Returns a processed comment string."
