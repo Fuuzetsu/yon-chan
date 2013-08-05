@@ -58,7 +58,7 @@
   (define-key yon-chan-mode-map (kbd "p") 'yon-jump-post-backward)
   (define-key yon-chan-mode-map (kbd "P") 'yon-jump-post-first)
   (define-key yon-chan-mode-map (kbd "N") 'yon-jump-post-last)
-  (define-key yon-chan-mode-map (kbd "r") 'yon-refresh-buffer))
+  (define-key yon-chan-mode-map (kbd "g") 'yon-refresh-buffer))
 
 (defvar yon-chan-mode-map (make-sparse-keymap)
   "yon-chan-mode keymap")
