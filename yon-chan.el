@@ -78,8 +78,8 @@
   :group 'yon-chan)
 
 (defface yon-face-post-subject
-  '((default :weight bold)
-    (((class color)) :foreground "brown"))
+  '((default (:inherit header-line :weight bold))
+    (((class color)) :foreground "sea green"))
   "Basic face for the post subject."
   :group 'yon-chan)
 
@@ -503,7 +503,7 @@ If newline is non-nil, newlines in the matching text will be removed."
 
 (defun yon-format-post (post)
   "Returns a formatted string representation of a post"
-  (format "%s\n%s"
+  (format "%s\n%s\n"
           (yon-format-post-header post)
           (yon-format-post-comment post)))
 
