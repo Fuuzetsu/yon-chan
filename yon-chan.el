@@ -63,7 +63,6 @@
 (defvar yon-chan-mode-map (make-sparse-keymap)
   "yon-chan-mode keymap")
 
-
 ;;;###autoload
 (defun yon-chan ()
   "Fetch and display 4chan boards."

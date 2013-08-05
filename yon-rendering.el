@@ -194,6 +194,11 @@ If newline is non-nil, newlines in the matching text will be removed."
                                     'face colourface))))))))))
 
 
+(defun yon-extract-quote-link (s)
+  "Splices out contents of a href quotelink string into a pair"
+  (let ((rx "<a href=\"\\(.+\\)\" class=\"quotelink\">\\(.+\\)</a>"))
+    (split-string (replace-regexp-in-string rx "\\1 \\2" s))))
+
 (defun yon-make-quote-buttons ()
   (let* ((start (string-match "<a href=\".*?\" class=\"quotelink\">"
                               (yon-get-line-content)))
