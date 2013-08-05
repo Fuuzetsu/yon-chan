@@ -619,27 +619,32 @@ The header consists of the subject, author, timestamp, and post number."
 
 (defun yon-jump-posts (amount)
   "Jumps `amount' of posts. Can be negative."
-  (let* ((posts (with-current-buffer (current-buffer) yon-buffer-posts))
-         ;; only go one direction
-         (dfilter (lambda (x) (> (* (cdr x) amount) 0)))
-         ;; take the closest absolute distance
-         (rrer (lambda (x y) (if (< (abs (cdr x)) (abs (cdr y))) x y)))
+  (let* ((posts (with-current-buffer (current-buffer)
+                  yon-buffer-posts))
          ;; zip index with distance
-         (ixed (-zip-with
+         (ixed
+          (-zip-with
                 (lambda (n p)
-                  (cons n (- (yon-post-renderpos p) (point))))
+                  (cons n (* amount
+                             (- (yon-post-renderpos p) (point)))))
                 (number-sequence 0 (length posts)) posts))
+         ;; only go one direction
+         (dfilter (lambda (x) (> (cdr x) 0)))
+         ;; posts going our way
          (cands (-filter dfilter ixed))
+         (ocands (if (> amount 0)
+                     cands
+                   (reverse cands)))
          (am (abs amount)))
     (if cands
         (if (>= am (length posts))
             (yon-jump-to-local-post
              (yon-post-number
-              (nth (first (cl-reduce rrer cands)) ;; pop off first
+              (nth (caar (last ocands))
                    posts)))
           (yon-jump-to-local-post
            (yon-post-number
-            (nth (car (nth am (cl-reduce rrer cands)))
+            (nth (car (nth (- am 1) ocands))
                  posts))))
       nil)))
 
@@ -673,7 +678,6 @@ The header consists of the subject, author, timestamp, and post number."
 (defun yon-jump-post-forward (&optional number)
   "Jump backward one post. Jump forward `n' posts if given an argument."
   (interactive "p")
-  (message (concat "jumping " (number-to-string number) " posts"))
   (yon-jump-posts number))
 
 (defun yon-jump-post-backward (&optional number)
