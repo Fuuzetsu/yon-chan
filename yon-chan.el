@@ -538,6 +538,15 @@ The header consists of the subject, author, timestamp, and post number."
           (buffer-string))
       (propertize post-number 'face 'yon-face-post-number))))
 
+;; We need a utils file
+(defmacro yon-zip-with (f xs ys)
+  "Just a reglar zipWith"
+  `(if (and ,xs ,ys)
+       (cons (,f (car ,xs) (car ,ys)) (yon-zip-with ,f (cdr ,xs) (cdr ,ys)))
+     '()))
+
+(defun yon-zip (xs ys) (yon-zip-with cons xs ys))
+
 
 (defun yon-jump-posts (amount)
   "Jumps `amount' of posts. Can be negative."
@@ -551,14 +560,15 @@ The header consists of the subject, author, timestamp, and post number."
                                (< (yon-post-renderpos x)
                                   (yon-post-renderpos y)))))
          (closest-post-index
-          (let ((closest (yon-post-renderpos (car posts)))
-                (index 0))
-            (dotimes (idx (length sorted-posts)) ;; it's like I'm really writing C!
-              (let ((rp (yon-post-renderpos (nth idx sorted-posts))))
-                (when (> (abs (- (point) closest)) (abs (- (point) rp)))
-                  (setq closest rp)
-                  (setq index idx))))
-            index))
+          (car
+           (reduce
+            (lambda (x y)
+              (if (< (cdr x) (cdr y)) x y))
+            (yon-zip-with
+             (lambda (n p)
+               (cons n ;; index
+                     (abs (- (point) (yon-post-renderpos p))))) ;; distance
+             (number-sequence 0 (length sorted-posts)) sorted-posts))))
          (new-idx (+ closest-post-index amount)))
     (if (< new-idx 0)
         (yon-jump-to-local-post (yon-post-number (nth 0 sorted-posts)))
