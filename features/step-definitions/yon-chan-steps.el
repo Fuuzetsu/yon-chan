@@ -20,6 +20,12 @@
               (message "Expected '%s' and got '%s'."))
           (assert (s-equals? expected actual) nil message expected actual))))
 
+(Then "^the cursor should be on line \"\\(.+\\)\"$"
+      (lambda (l)
+        (assert (= (line-number-at-pos) (string-to-number l)) nil
+                "Expected to be on line '%s' but are on line '%d'"
+                l (line-number-at-pos))))
+
 (When "^I render \"\\(.+\\)\" as \"\\(.+\\)\"$"
       (lambda (stub board)
         (insert-file-contents (concat "features/stubs/" stub))
