@@ -604,7 +604,7 @@ The header consists of the subject, author, timestamp, and post number."
 (defun display-image-other-window (url name)
   (lexical-let ((name name))
     (url-retrieve
-     url
+     (progn (message (concat "Retrieving " url)) url)
      (lambda (status)
        (rename-buffer name t)
        ;; Delete HTTP header
