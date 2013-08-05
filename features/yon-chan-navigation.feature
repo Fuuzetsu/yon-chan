@@ -8,6 +8,10 @@ Feature: Moving between posts in yon-chan thread view
     Then the cursor should be on line "10"
     And I press "n"
     Then the cursor should be on line "13"
+    And I press "n"
+    Then the cursor should be on line "16"
+    And I press "p"
+    Then the cursor should be on line "13"
     And I press "p"
     Then the cursor should be on line "10"
     And I press "p"
@@ -21,11 +25,6 @@ Feature: Moving between posts in yon-chan thread view
     Then the cursor should be on line "1"
     And I press "n"
     Then the cursor should be on line "10"
-    And I press "n"
-    Then the cursor should be on line "13"
-    And I press "n"
-    Then the cursor should be on line "16"
-
 
   Scenario: Attempting to move past last post
     When I render "small-thread.json" as "/g/"
