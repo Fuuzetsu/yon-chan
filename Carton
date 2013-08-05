@@ -5,3 +5,4 @@
 (depends-on "mocker")
 (depends-on "ecukes")
 (depends-on "espuds")
+(depends-on "dash")

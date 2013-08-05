@@ -28,6 +28,7 @@
 
 (require 'json)
 (require 'cl-lib)
+(require 'dash)
 
 ;;; Yon-chan mode
 (defgroup yon-chan nil
@@ -616,42 +617,31 @@ The header consists of the subject, author, timestamp, and post number."
 ;;; Navigation
 ;;;
 
-;; We need a utils file
-(defmacro yon-zip-with (f xs ys)
-  "Just a reglar zipWith"
-  `(if (and ,xs ,ys)
-       (cons (,f (car ,xs) (car ,ys)) (yon-zip-with ,f (cdr ,xs) (cdr ,ys)))
-     '()))
-
-(defun yon-zip (xs ys) (yon-zip-with cons xs ys))
-
 (defun yon-jump-posts (amount)
   "Jumps `amount' of posts. Can be negative."
   (let* ((posts (with-current-buffer (current-buffer) yon-buffer-posts))
-
-         (sorted-posts (sort yon-buffer-posts
-                             (lambda (x y)
-                               ;; This currently is just a safety measure,
-                               ;; they should be presorted for now.
-                               "Sorts posts based on their render position."
-                               (< (yon-post-renderpos x)
-                                  (yon-post-renderpos y)))))
-         (closest-post-index
-          (car
-           (reduce
-            (lambda (x y)
-              (if (< (cdr x) (cdr y)) x y))
-            (yon-zip-with
-             (lambda (n p)
-               (cons n ;; index
-                     (abs (- (point) (yon-post-renderpos p))))) ;; distance
-             (number-sequence 0 (length sorted-posts)) sorted-posts))))
-         (new-idx (+ closest-post-index amount)))
-    (if (< new-idx 0)
-        (yon-jump-to-local-post (yon-post-number (nth 0 sorted-posts)))
-      (if (>= new-idx (length sorted-posts))
-          (yon-jump-to-local-post (yon-post-number (car (last sorted-posts))))
-        (yon-jump-to-local-post (yon-post-number (nth new-idx sorted-posts)))))))
+         ;; only go one direction
+         (dfilter (lambda (x) (> (* (cdr x) amount) 0)))
+         ;; take the closest absolute distance
+         (rrer (lambda (x y) (if (< (abs (cdr x)) (abs (cdr y))) x y)))
+         ;; zip index with distance
+         (ixed (-zip-with
+                (lambda (n p)
+                  (cons n (- (yon-post-renderpos p) (point))))
+                (number-sequence 0 (length posts)) posts))
+         (cands (-filter dfilter ixed))
+         (am (abs amount)))
+    (if cands
+        (if (>= am (length posts))
+            (yon-jump-to-local-post
+             (yon-post-number
+              (nth (first (cl-reduce rrer cands)) ;; pop off first
+                   posts)))
+          (yon-jump-to-local-post
+           (yon-post-number
+            (nth (car (nth am (cl-reduce rrer cands)))
+                 posts))))
+      nil)))
 
 (defun yon-jump-to-local-post (number)
   (let ((render-place))
@@ -683,6 +673,7 @@ The header consists of the subject, author, timestamp, and post number."
 (defun yon-jump-post-forward (&optional number)
   "Jump backward one post. Jump forward `n' posts if given an argument."
   (interactive "p")
+  (message (concat "jumping " (number-to-string number) " posts"))
   (yon-jump-posts number))
 
 (defun yon-jump-post-backward (&optional number)

@@ -47,7 +47,7 @@ Feature: Moving between posts in yon-chan thread view
     When I go to beginning of buffer
     Then the cursor should be on line "1"
     And I press "C-u 3 n"
-    Then the cursor should be on line "16"
+    Then the cursor should be on line "10"
     And I press "C-u 3 p"
     Then the cursor should be on line "1"
 
@@ -55,7 +55,7 @@ Feature: Moving between posts in yon-chan thread view
     When I render "small-thread.json" as "/g/"
     When I go to line "40"
     And I press "C-u 3 p"
-    Then the cursor should be on line "23"
+    Then the cursor should be on line "35"
     And I press "C-u 3 n"
     Then the cursor should be on line "40"
 

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-ECUKES=$(find elpa/ecukes-*/ecukes | tail -1)
+ECUKES=$(find elpa/ecukes-*/bin/ecukes | tail -1)
 
 carton exec "$ECUKES" "$@"
 RESULT=$?
