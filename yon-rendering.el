@@ -164,5 +164,157 @@
                 (replace-regexp-in-string "^" "    "
                                           (yon-format-post post))) "\n")))))
 
+(defun yon-possibly-colorify-line-by-tags
+  (opregex endregex colourface &optional newline)
+  "Applies colourface to anything between opregex and endregex.
+If newline is non-nil, newlines in the matching text will be removed."
+  (let ((start (string-match opregex (yon-get-line-content)))
+        (op opregex)
+        (ed endregex))
+    (when start
+      (let* ((startn (+ start (line-beginning-position)))
+             (end (+ (yon-get-closing-point
+                      (yon-get-section startn (point-max)) ed)
+                     startn)))
+        (save-excursion
+          (goto-char startn)
+          (delete-char (length op))
+          (goto-char (- end (length op)))
+          (delete-backward-char (length ed))
+          (goto-char startn)
+          (let ((cont (yon-get-section startn (- end
+                                                 (+ (length op)
+                                                    (length ed))))))
+            (progn
+              (delete-char (length cont))
+              (if newline
+                  (insert (propertize (yon-strip-newlines cont)
+                                      'face colourface))
+                (insert (propertize cont
+                                    'face colourface))))))))))
+
+
+(defun yon-make-quote-buttons ()
+  (let* ((start (string-match "<a href=\".*?\" class=\"quotelink\">"
+                              (yon-get-line-content)))
+         (op "<a href\"")
+         (ed  "</a>"))
+    (when start
+      (let* ((startn (+ start (line-beginning-position)))
+             (end (+ (yon-get-closing-point
+                      (yon-get-section startn (point-max)) ed)
+                     startn)))
+        (save-excursion
+          (goto-char startn)
+          (delete-char (+ 1 (length op)))
+          (goto-char (- end (+ 1 (length op))))
+          (delete-backward-char (length ed))
+          (goto-char startn)
+          (zap-to-char 1 (string-to-char "\""))
+          (delete-char (length " class=\"quotelink\">"))
+          (insert (current-kill 0))
+          (delete-backward-char 1)
+          (insert " ")
+          (goto-char startn)
+          (let* ((split-cont (split-string
+                              (yon-get-section
+                               startn
+                               (- end (+ (length op)
+                                         (length " class=\"quotelink\">")
+                                         (length ed)
+                                         1))) ;; space
+                              " "))
+                 (link (split-string (car split-cont) "#p"))
+                 (res-start (string-match "/res/" (car link))))
+            (progn
+              (delete-char (+ (length (car split-cont))
+                              (length (cadr split-cont))
+                              1))
+              (if res-start
+                  (progn
+                    (goto-char startn)
+                    (lexical-let* ((board
+                                    (with-temp-buffer
+                                      (insert (car link))
+                                      (goto-char (point-min))
+                                      (zap-to-char 2 (string-to-char "/"))
+                                      (erase-buffer)
+                                      (insert (current-kill 0))
+                                      (goto-char (point-min))
+                                      (delete-char 1)
+                                      (goto-char (point-max))
+                                      (delete-backward-char 1)
+                                      (buffer-string)))
+                                   (thread
+                                    (with-temp-buffer
+                                      (insert (car link))
+                                      (goto-char (point-min))
+                                      (delete-char (+ 2
+                                                      (length board)
+                                                      (length "res/")))
+                                      (buffer-string)))
+                                   (post (cadr link)))
+                      (let ((kmap (make-sparse-keymap)))
+                        (define-key kmap (kbd "<return>")
+                          (lambda ()
+                            (interactive)
+                            (yon-browse-thread
+                             (switch-to-buffer-other-window
+                              (generate-new-buffer
+                               (concat "*yon-chan-/" board "/-" thread)))
+                             board thread)))
+                        (define-key kmap (kbd "a")
+                          (lambda ()
+                            (interactive)
+                            (yon-browse-thread
+                             (with-current-buffer
+                                 (rename-buffer (concat "*yon-chan-/" board "/-" thread))
+                               (current-buffer))
+                             board thread)))
+                        (insert-text-button (yon-strip-newlines (cadr split-cont))
+                                            'face 'yon-face-post-number-link
+                                            'keymap kmap))))
+                (if (equal 1 (length link)) ;; simple link such as >>>/a/
+                    (lexical-let ((board (car link))
+                                  (kmap (make-sparse-keymap)))
+                      (define-key kmap (kbd "<return>")
+                        (lambda ()
+                          (interactive)
+                          (yon-browse-board-catalog
+                           (switch-to-buffer-other-window
+                            (generate-new-buffer
+                             (concat "*yon-chan-/" board "/*")))
+                           (substring board 1 (- (length board) 1)))))
+                      (define-key kmap (kbd "a")
+                        (lambda ()
+                          (interactive)
+                          (yon-browse-board-catalog
+                           (with-current-buffer
+                               (rename-buffer (concat "*yon-chan-/" board "/*"))
+                             (current-buffer))
+                           (substring board 1 (- (length board) 1)))))
+                      (insert-text-button (yon-strip-newlines (cadr split-cont))
+                                          'face 'yon-face-post-number-link
+                                          'keymap kmap)
+                      )
+                  (lexical-let ((thread (car link))
+                                (post (cadr link))
+                                (kmap (make-sparse-keymap))
+                                (board (with-current-buffer (buffer-name)
+                                         yon-current-board)))
+                    (define-key kmap (kbd "<return>")
+                      (lambda ()
+                        (interactive)
+                        (yon-jump-to-local-post (string-to-number post))))
+                    (insert-text-button (yon-strip-newlines (cadr split-cont))
+                                        'face 'yon-face-post-number-link
+                                        'keymap kmap)))))))))))
+
+
+(defun yon-process-post (body)
+  (let* ((cleaned (yon-clean-html-string body)))
+    cleaned))
+
+
 (provide 'yon-rendering)
 ;;; yon-rendering.el ends here

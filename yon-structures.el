@@ -21,7 +21,8 @@
 
 ;;; Commentary:
 
-;; This file contains various structures used throughout yon-chan
+;; This file contains various structures and related functions  used throughout
+;;  yon-chan
 
 ;;; Code:
 
@@ -98,6 +99,21 @@
    :bumplimit        (yon-elem response 'bumplimit)
    :imagelimit       (yon-elem response 'imagelimit)
    :renderpos        '()))
+
+
+(defun yon-build-thread (response buffer)
+  (with-current-buffer buffer
+    (set (make-local-variable 'yon-buffer-posts)
+         (mapcar 'yon-build-post (yon-elem response 'posts)))))
+
+(defun yon-build-catalog (response buffer)
+  (with-current-buffer buffer
+    (let ((pages (mapcar 'yon-build-page response)))
+      (set (make-local-variable 'yon-buffer-posts) (-flatten pages))
+      pages)))
+
+(defun yon-build-page (response)
+  (mapcar 'yon-build-post (yon-elem response 'threads)))
 
 
 (provide 'yon-structures)

@@ -104,5 +104,59 @@
   (yon-jump-to-nth (- (length yon-buffer-posts) 1)))
 
 
+(defun yon-browse-board-catalog (buffer board)
+  (url-retrieve (concat "http://api.4chan.org/" board "/catalog.json")
+                (lexical-let ((yon-buffer buffer)
+                              (board-l board))
+                  (with-current-buffer yon-buffer
+                    (yon-chan-mode)
+                    (set (make-local-variable 'yon-current-board) board)
+                    (set (make-local-variable 'yon-refresh)
+                         (lambda ()
+                           "Function called when we want to refresh the catalog"
+                           (yon-browse-board-catalog yon-buffer board-l)))
+                    (lambda (status)
+                      (yon-render yon-buffer
+                                  'yon-render-catalog
+                                  (yon-build-catalog (yon-get-and-parse-json)
+                                                     yon-buffer)))))))
+
+(defun yon-refresh-buffer (&optional buffer)
+  "Refreshes arbitrary buffer"
+  (interactive)
+  (with-current-buffer (if buffer buffer (current-buffer))
+    (funcall yon-refresh)))
+
+(defun yon-browse-thread (buffer board thread-number)
+  (url-retrieve
+   (concat "http://api.4chan.org/" board "/res/" thread-number ".json")
+   (lexical-let ((yon-buffer buffer)
+                 (board-l board)
+                 (thread-number-l thread-number))
+     (with-current-buffer yon-buffer
+       (yon-chan-mode)
+       (set (make-local-variable 'yon-current-board) board)
+       (set (make-local-variable 'yon-refresh)
+            (lambda ()
+              "Function called when we want to refresh the whole thread"
+              (yon-browse-thread yon-buffer board-l thread-number-l)))
+       (lambda (status)
+         (yon-render yon-buffer
+                     'yon-render-thread
+                     (yon-build-thread (yon-get-and-parse-json) yon-buffer)))))))
+
+(defun yon-chan-browse-board (board)
+  "Shows the specified board's catalog."
+  (interactive "MEnter the board you wish to visit: ")
+  (let ((clean-board (if (string-match "/.+?/" board)
+                         (substring board 1 -1)
+                       board)))
+    (with-current-buffer (switch-to-buffer-other-window
+                          (generate-new-buffer (concat "*yon-chan-/"
+                                                       clean-board "/*")))
+      (yon-chan-mode)
+      (yon-browse-board-catalog (current-buffer) clean-board))))
+
+
 (provide 'yon-navigation)
 ;;; yon-navigation.el ends here
