@@ -514,10 +514,10 @@ The header consists of the subject, author, timestamp, and post number."
                              (yon-format-post-author post)
                              (yon-format-post-timestamp post)
                              (yon-format-post-number post)
-                             (yon-format-post-image post)))))
-  ;; Some header items could be blank (such as the image filename), so
-  ;; remove all nil values.
-  (json-join  (remq nil items) " - "))
+                             (yon-format-post-image post))))
+    ;; Some header items could be blank (such as the image filename), so
+    ;; remove all nil values.
+    (json-join  (remq nil items) " - ")))
 
 (defun yon-format-post-comment (post)
   "Returns a processed comment string."
