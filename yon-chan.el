@@ -383,8 +383,8 @@ If newline is non-nil, newlines in the matching text will be removed."
   country
   country-name
   email
-  ext
-  fsize
+  extension
+  file-size
   md5
   image-width
   image-height
@@ -422,8 +422,8 @@ If newline is non-nil, newlines in the matching text will be removed."
    :country          (yon-elem response 'country)
    :country-name     (yon-elem response 'country_name)
    :email            (yon-elem response 'email)
-   :ext              (yon-elem response 'ext)
-   :fsize            (yon-elem response 'fsize)
+   :extension        (yon-elem response 'ext)
+   :file-size        (yon-elem response 'fsize)
    :md5              (yon-elem response 'md5)
    :image-width      (yon-elem response 'w)
    :image-height     (yon-elem response 'h)
@@ -431,9 +431,9 @@ If newline is non-nil, newlines in the matching text will be removed."
    :thumbnail-height (yon-elem response 'tn_h)
    :file-deleted     (yon-elem response 'filedeleted)
    :spoiler          (yon-elem response 'spoiler)
-   :custom_spoiler   (yon-elem response 'custom_spoiler)
-   :omitted_posts    (yon-elem response 'omitted_posts)
-   :omitted_images   (yon-elem response 'omitted_images)
+   :custom-spoiler   (yon-elem response 'custom_spoiler)
+   :omitted-posts    (yon-elem response 'omitted_posts)
+   :omitted-images   (yon-elem response 'omitted_images)
    :replies          (yon-elem response 'replies)
    :images           (yon-elem response 'images)
    :bumplimit        (yon-elem response 'bumplimit)
