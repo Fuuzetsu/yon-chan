@@ -3,6 +3,7 @@
 ;; loaded automatically by Ecukes.
 
 (eval-when-compile (require 'cl))
+(require 'yon-chan)
 
 (When "^I go to the \\(front\\|end\\) of the word \"\\(.+\\)\"$"
       (lambda (pos word)
@@ -12,21 +13,19 @@
           (assert search nil message word (espuds-buffer-contents))
           (if (string-equal "front" pos) (backward-word)))))
 
-(When "^I go to the \\(beginning\\|end\\) of the \\(line\\|buffer\\)$"
-      (lambda (pos word)
-        (if (string-equal "front" pos) (backward-word)
-          (if (string-equal "line" word)
-              (move-beginning-of-line)
-            (beginning-of-buffer))
-          (if (string-equal "line" word)
-              (move-end-of-line)
-            (end-of-buffer)))))
-
-
-
 (Then "^I should see exactly\\(?: \"\\(.+\\)\"\\|:\\)$"
       "Asserts that the current buffer includes some text."
       (lambda (expected)
         (let ((actual (espuds-buffer-contents))
               (message "Expected '%s' and got '%s'."))
           (assert (s-equals? expected actual) nil message expected actual))))
+
+(When "^I render \"\\(.+\\)\" as \"\\(.+\\)\"$"
+      (lambda (stub board)
+        (insert-file-contents (concat "features/stubs/" stub))
+        (yon-chan-mode)
+        (set (make-local-variable 'yon-current-board) board)
+        (yon-render (current-buffer)
+                    'yon-render-thread
+                    (yon-build-thread (yon-parse-json (buffer-string))
+                                      (current-buffer)))))
