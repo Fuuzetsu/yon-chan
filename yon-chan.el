@@ -367,48 +367,78 @@ If newline is non-nil, newlines in the matching text will be removed."
 ;; The atoms of 4chan.
 
 (cl-defstruct yon-post
-  subject author timestamp number comment
-  filename replyto sticky closed time trip id capcode country
-  country_name email ext fsize md5 image_w image_h thumbnail_w thumbnail_h
-  filedeleted spoiler custom_spoiler omitted_posts omitted_images replies
-  images bumplimit imagelimit new_filename renderpos)
+  subject
+  author
+  timestamp
+  number
+  comment
+  filename
+  replyto
+  sticky
+  closed
+  time
+  trip
+  id
+  capcode
+  country
+  country-name
+  email
+  ext
+  fsize
+  md5
+  image-width
+  image-height
+  thumbnail-width
+  thumbnail-height
+  file-deleted
+  spoiler
+  custom-spoiler
+  omitted-posts
+  omitted-images
+  replies
+  images
+  bumplimit
+  imagelimit
+  new-filename
+  renderpos)
 
 (defun yon-build-post (response)
   "Builds a post object from deserialized JSON response."
-  (make-yon-post :subject        (yon-elem response 'sub "No subject")
-                 :author         (yon-elem response 'name "Anonymous")
-                 :timestamp      (yon-elem response 'now)
-                 :number         (yon-elem response 'no)
-                 :comment        (yon-elem response 'com "")
-                 :filename       (yon-elem response 'filename)
-                 :replyto        (yon-elem response 'resto) ;; 0 is OP
-                 :sticky         (yon-elem response 'sticky)
-                 :closed         (yon-elem response 'closed)
-                 :new_filename   (yon-elem response 'tim)
-                 :time           (yon-elem response 'time)
-                 :trip           (yon-elem response 'trip)
-                 :id             (yon-elem response 'id)
-                 :capcode        (yon-elem response 'capcode)
-                 :country        (yon-elem response 'country)
-                 :country_name   (yon-elem response 'country_name)
-                 :email          (yon-elem response 'email)
-                 :ext            (yon-elem response 'ext)
-                 :fsize          (yon-elem response 'fsize)
-                 :md5            (yon-elem response 'md5)
-                 :image_w        (yon-elem response 'w)
-                 :image_h        (yon-elem response 'h)
-                 :thumbnail_w    (yon-elem response 'tn_w)
-                 :thumbnail_h    (yon-elem response 'tn_h)
-                 :filedeleted    (yon-elem response 'filedeleted)
-                 :spoiler        (yon-elem response 'spoiler)
-                 :custom_spoiler (yon-elem response 'custom_spoiler)
-                 :omitted_posts  (yon-elem response 'omitted_posts)
-                 :omitted_images (yon-elem response 'omitted_images)
-                 :replies        (yon-elem response 'replies)
-                 :images         (yon-elem response 'images)
-                 :bumplimit      (yon-elem response 'bumplimit)
-                 :imagelimit     (yon-elem response 'imagelimit)
-                 :renderpos      '()))
+  (make-yon-post
+   :subject          (yon-elem response 'sub "No subject")
+   :author           (yon-elem response 'name "Anonymous")
+   :timestamp        (yon-elem response 'now)
+   :number           (yon-elem response 'no)
+   :comment          (yon-elem response 'com "")
+   :filename         (yon-elem response 'filename)
+   :replyto          (yon-elem response 'resto) ;; 0 is OP
+   :sticky           (yon-elem response 'sticky)
+   :closed           (yon-elem response 'closed)
+   :new-filename     (yon-elem response 'tim)
+   :time             (yon-elem response 'time)
+   :trip             (yon-elem response 'trip)
+   :id               (yon-elem response 'id)
+   :capcode          (yon-elem response 'capcode)
+   :country          (yon-elem response 'country)
+   :country-name     (yon-elem response 'country_name)
+   :email            (yon-elem response 'email)
+   :ext              (yon-elem response 'ext)
+   :fsize            (yon-elem response 'fsize)
+   :md5              (yon-elem response 'md5)
+   :image-width      (yon-elem response 'w)
+   :image-height     (yon-elem response 'h)
+   :thumbnail-width  (yon-elem response 'tn_w)
+   :thumbnail-height (yon-elem response 'tn_h)
+   :file-deleted     (yon-elem response 'filedeleted)
+   :spoiler          (yon-elem response 'spoiler)
+   :custom_spoiler   (yon-elem response 'custom_spoiler)
+   :omitted_posts    (yon-elem response 'omitted_posts)
+   :omitted_images   (yon-elem response 'omitted_images)
+   :replies          (yon-elem response 'replies)
+   :images           (yon-elem response 'images)
+   :bumplimit        (yon-elem response 'bumplimit)
+   :imagelimit       (yon-elem response 'imagelimit)
+   :renderpos        '()))
 
 
 (defun yon-build-thread (response buffer)
@@ -484,7 +514,8 @@ The header consists of the subject, author, timestamp, and post number."
           (yon-format-post-subject post)
           (yon-format-post-author post)
           (yon-format-post-timestamp post)
-          (yon-format-post-number post)))
+          (yon-format-post-number post)
+          (yon-format-post-image post)))
 
 (defun yon-format-post-comment (post)
   "Returns a processed comment string."
@@ -505,6 +536,8 @@ The header consists of the subject, author, timestamp, and post number."
 (defun yon-format-post-timestamp (post)
   "Returns an html-cleaned timestamp string."
   (yon-clean-html-string (yon-post-timestamp post)))
+
+(defun yon-format-post-image)
 
 (defun yon-format-post-number (post)
   "Returns the post number. Clickable if it's a thread OP."
