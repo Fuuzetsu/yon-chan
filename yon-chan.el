@@ -31,6 +31,8 @@
 (require 'dash)
 (require 'yon-rendering)
 (require 'yon-formatting)
+(require 'yon-navigation)
+(require 'yon-structures)
 
 ;;; Yon-chan mode
 (defgroup yon-chan nil
@@ -231,55 +233,6 @@ If newline is non-nil, newlines in the matching text will be removed."
                                         'face 'yon-face-post-number-link
                                         'keymap kmap)))))))))))
 
-(defun yon-apply-deadlinks (text)
-  "Checks each line for deadlink replacement."
-  (save-excursion
-    (lexical-let ((board (with-current-buffer (current-buffer)
-                           yon-current-board)))
-      (with-temp-buffer
-        (set (make-local-variable 'yon-current-board) board)
-        (insert text)
-        (goto-char (point-min))
-        (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
-                                  "<span class=\"deadlink\">" "</span>"
-                                  'yon-face-deadlink t)
-                 (forward-line 1))
-        (buffer-string)))))
-
-(defmacro yon-apply-face-between-regex (text face oprx endrx nl)
-  "Macro that generalises face application between regex delimiters."
-  `(save-excursion
-    (lexical-let ((board (with-current-buffer (current-buffer)
-                           yon-current-board)))
-      (with-temp-buffer
-        (set (make-local-variable 'yon-current-board) board)
-        (insert ,text)
-        (goto-char (point-min))
-        (cl-loop until (eobp) do (yon-possibly-colorify-line-by-tags
-                                  ,oprx ,endrx ,face ,nl)
-                 (forward-line 1))
-        (buffer-string)))))
-
-(defun yon-apply-greentext (text)
-  "Checks each line for greentext replacement."
-  (yon-apply-face-between-regex
-   text 'yon-face-greentext "<span class=\"quote\">" "</span>" t))
-
-(defun yon-apply-prettyprint (text)
-  (yon-apply-face-between-regex
-   text 'yon-face-prettyprint "<pre class=\"prettyprint\">" "</pre>" nil))
-
-(defun yon-apply-quotelinks (text)
-  (save-excursion
-    (lexical-let ((board (with-current-buffer (current-buffer)
-                           yon-current-board)))
-      (with-temp-buffer
-        (set (make-local-variable 'yon-current-board) board)
-        (insert text)
-        (goto-char (point-min))
-        (cl-loop until (eobp) do (yon-make-quote-buttons) (forward-line 1))
-        (buffer-string)))))
-
 
 (defun yon-strip-newlines (body)
   (replace-regexp-in-string "\n" "" body))
@@ -318,80 +271,6 @@ If newline is non-nil, newlines in the matching text will be removed."
 
 ;; The atoms of 4chan.
 
-(cl-defstruct yon-post
-  subject
-  author
-  timestamp
-  number
-  comment
-  filename
-  replyto
-  sticky
-  closed
-  time
-  trip
-  id
-  capcode
-  country
-  country-name
-  email
-  extension
-  file-size
-  md5
-  image-width
-  image-height
-  thumbnail-width
-  thumbnail-height
-  file-deleted
-  spoiler
-  custom-spoiler
-  omitted-posts
-  omitted-images
-  replies
-  images
-  bumplimit
-  imagelimit
-  new-filename
-  renderpos)
-
-(defun yon-build-post (response)
-  "Builds a post object from deserialized JSON response."
-  (make-yon-post
-   :subject          (yon-elem response 'sub "No subject")
-   :author           (yon-elem response 'name "Anonymous")
-   :timestamp        (yon-elem response 'now)
-   :number           (yon-elem response 'no)
-   :comment          (yon-elem response 'com "")
-   :filename         (yon-elem response 'filename)
-   :replyto          (yon-elem response 'resto) ;; 0 is OP
-   :sticky           (yon-elem response 'sticky)
-   :closed           (yon-elem response 'closed)
-   :new-filename     (yon-elem response 'tim)
-   :time             (yon-elem response 'time)
-   :trip             (yon-elem response 'trip)
-   :id               (yon-elem response 'id)
-   :capcode          (yon-elem response 'capcode)
-   :country          (yon-elem response 'country)
-   :country-name     (yon-elem response 'country_name)
-   :email            (yon-elem response 'email)
-   :extension        (yon-elem response 'ext)
-   :file-size        (yon-elem response 'fsize)
-   :md5              (yon-elem response 'md5)
-   :image-width      (yon-elem response 'w)
-   :image-height     (yon-elem response 'h)
-   :thumbnail-width  (yon-elem response 'tn_w)
-   :thumbnail-height (yon-elem response 'tn_h)
-   :file-deleted     (yon-elem response 'filedeleted)
-   :spoiler          (yon-elem response 'spoiler)
-   :custom-spoiler   (yon-elem response 'custom_spoiler)
-   :omitted-posts    (yon-elem response 'omitted_posts)
-   :omitted-images   (yon-elem response 'omitted_images)
-   :replies          (yon-elem response 'replies)
-   :images           (yon-elem response 'images)
-   :bumplimit        (yon-elem response 'bumplimit)
-   :imagelimit       (yon-elem response 'imagelimit)
-   :renderpos        '()))
-
 
 (defun yon-build-thread (response buffer)
   (with-current-buffer buffer
@@ -411,25 +290,6 @@ If newline is non-nil, newlines in the matching text will be removed."
 
 (defun yon-build-page (response)
   (mapcar 'yon-build-post (yon-elem response 'threads)))
-
-;;; Rendering
-
-(defun yon-render-catalog-page (page)
-  (dolist (post page)
-    (setf (yon-post-renderpos post) (point))
-    (insert (concat (yon-apply-faces (yon-format-post post)) "\n"))))
-
-(defun yon-render-thread (posts)
-  (let ((op (car posts))
-        (replies (cdr posts)))
-    (setf (yon-post-renderpos op) (point))
-    (insert (yon-apply-faces (concat (yon-format-post op))) "\n")
-    (dolist (post replies)
-      (setf (yon-post-renderpos post) (point))
-      (insert
-       (concat (yon-apply-faces
-                (replace-regexp-in-string "^" "    "
-                                          (yon-format-post post))) "\n")))))
 
 ;;;
 ;;; Actions
@@ -451,83 +311,6 @@ If newline is non-nil, newlines in the matching text will be removed."
 ;;; Navigation
 ;;;
 
-(defun yon-jump-posts (amount)
-  "Jumps `amount' of posts. Can be negative."
-  (let* ((posts (with-current-buffer (current-buffer)
-                  yon-buffer-posts))
-         ;; zip index with distance
-         (ixed
-          (-zip-with
-                (lambda (n p)
-                  (cons n (* amount
-                             (- (yon-post-renderpos p) (point)))))
-                (number-sequence 0 (length posts)) posts))
-         ;; only go one direction
-         (dfilter (lambda (x) (> (cdr x) 0)))
-         ;; posts going our way
-         (cands (-filter dfilter ixed))
-         (ocands (if (> amount 0)
-                     cands
-                   (reverse cands)))
-         (am (abs amount)))
-    (if cands
-        (if (>= am (length posts))
-            (yon-jump-to-local-post
-             (yon-post-number
-              (nth (caar (last ocands))
-                   posts)))
-          (yon-jump-to-local-post
-           (yon-post-number
-            (nth (car (nth (- am 1) ocands))
-                 posts))))
-      nil)))
-
-(defun yon-jump-to-local-post (number)
-  (let ((render-place))
-    (dolist (post (with-current-buffer (current-buffer) yon-buffer-posts))
-      (when (equal number (yon-post-number post))
-        (setq render-place (yon-post-renderpos post))))
-    (if render-place
-        (progn
-          (goto-char render-place)
-          (recenter-top-bottom 0)) ;; I'm not too sure about this
-      (message "Could not find post %s to jump to." (number-to-string number)))))
-
-(defun yon-jump-to-nth (n)
-  "Jumps to nth post. Negative n gives first post too high n gives last post."
-  (let ((sorted-posts (sort yon-buffer-posts
-                            (lambda (x y)
-                              ;; This currently is just a safety measure,
-                              ;; they should be presorted for now.
-                              "Sorts posts based on their render position."
-                              (< (yon-post-renderpos x)
-                                 (yon-post-renderpos y))))))
-    (cond
-     ((< n 0) (yon-jump-to-local-post (yon-post-number (nth 0 sorted-posts))))
-     ((> n (- (length sorted-posts) 1))
-           (yon-jump-to-local-post
-            (yon-post-number (nth (- (length sorted-posts) 1) sorted-posts))))
-     (t (yon-jump-to-local-post (yon-post-number (nth n sorted-posts)))))))
-
-(defun yon-jump-post-forward (&optional number)
-  "Jump backward one post. Jump forward `n' posts if given an argument."
-  (interactive "p")
-  (yon-jump-posts number))
-
-(defun yon-jump-post-backward (&optional number)
-  "Jump backward one post. Jump backward `n' posts if given an argument."
-  (interactive "p")
-  (yon-jump-posts (* -1 number)))
-
-(defun yon-jump-post-first ()
-  "Jump to first post on the page."
-  (interactive)
-  (yon-jump-to-nth 0))
-
-(defun yon-jump-post-last ()
-  "Jump to last post on the page."
-  (interactive)
-  (yon-jump-to-nth (- (length yon-buffer-posts) 1)))
 
 
 (defun yon-browse-board-catalog (buffer board)
