@@ -105,16 +105,15 @@ test</span>"))
         (with-current-buffer result-buffer
           (yon-render-catalog catalog)
           (should (string= (buffer-string)
-                           (concat "No subject - Anonymous - 05/03/13(Fri)10:16 - 33505434
-Anyone still using their Raspberry Pi or did you get bored? "
-                                   "
+                           (concat "No subject - Anonymous - 05/03/13(Fri)10:16 - 33505434 - tumblr_mkkn4lO8TQ1s6c71uo1_250.jpg
+Anyone still using their Raspberry Pi or did you get bored? " "
 
 What have you guys done with yours?
-No subject - Anonymous - 05/03/13(Fri)06:23 - 33502527
+
+No subject - Anonymous - 05/03/13(Fri)06:23 - 33502527 - 144p.jpg
 Why haven't you joined the 144p master race yet /g/?
+
 "))))))))
-
-
 
 ;;; Posts
 

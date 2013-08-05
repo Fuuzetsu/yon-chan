@@ -28,6 +28,7 @@
 
 (require 'json)
 (require 'cl-lib)
+(require 'dash)
 
 ;;; Yon-chan mode
 (defgroup yon-chan nil
@@ -618,30 +619,34 @@ The header consists of the subject, author, timestamp, and post number."
 
 (defun yon-jump-posts (amount)
   "Jumps `amount' of posts. Can be negative."
-  (let* ((posts (with-current-buffer (current-buffer) yon-buffer-posts))
-
-         (sorted-posts (sort yon-buffer-posts
-                             (lambda (x y)
-                               ;; This currently is just a safety measure,
-                               ;; they should be presorted for now.
-                               "Sorts posts based on their render position."
-                               (< (yon-post-renderpos x)
-                                  (yon-post-renderpos y)))))
-         (closest-post-index
-          (let ((closest (yon-post-renderpos (car posts)))
-                (index 0))
-            (dotimes (idx (length sorted-posts)) ;; it's like I'm really writing C!
-              (let ((rp (yon-post-renderpos (nth idx sorted-posts))))
-                (when (> (abs (- (point) closest)) (abs (- (point) rp)))
-                  (setq closest rp)
-                  (setq index idx))))
-            index))
-         (new-idx (+ closest-post-index amount)))
-    (if (< new-idx 0)
-        (yon-jump-to-local-post (yon-post-number (nth 0 sorted-posts)))
-      (if (>= new-idx (length sorted-posts))
-          (yon-jump-to-local-post (yon-post-number (car (last sorted-posts))))
-        (yon-jump-to-local-post (yon-post-number (nth new-idx sorted-posts)))))))
+  (let* ((posts (with-current-buffer (current-buffer)
+                  yon-buffer-posts))
+         ;; zip index with distance
+         (ixed
+          (-zip-with
+                (lambda (n p)
+                  (cons n (* amount
+                             (- (yon-post-renderpos p) (point)))))
+                (number-sequence 0 (length posts)) posts))
+         ;; only go one direction
+         (dfilter (lambda (x) (> (cdr x) 0)))
+         ;; posts going our way
+         (cands (-filter dfilter ixed))
+         (ocands (if (> amount 0)
+                     cands
+                   (reverse cands)))
+         (am (abs amount)))
+    (if cands
+        (if (>= am (length posts))
+            (yon-jump-to-local-post
+             (yon-post-number
+              (nth (caar (last ocands))
+                   posts)))
+          (yon-jump-to-local-post
+           (yon-post-number
+            (nth (car (nth (- am 1) ocands))
+                 posts))))
+      nil)))
 
 (defun yon-jump-to-local-post (number)
   (let ((render-place))
