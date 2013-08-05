@@ -201,7 +201,7 @@ end test"))
                                          ((:input (list post) :output "foo")))
                  (yon-format-post-comment (p)
                                           ((:input (list post) :output "bar"))))
-      (should (string= (yon-format-post post) "foo\nbar")))))
+      (should (string= (yon-format-post post) "foo\nbar\n")))))
 
 (ert-deftest test-yon-format-post-header ()
   "Test formatting post header string."
@@ -213,9 +213,11 @@ end test"))
                  (yon-format-post-timestamp (p)
                                             ((:input (list post) :output "the time")))
                  (yon-format-post-number (p)
-                                         ((:input (list post) :output 1))))
+                                         ((:input (list post) :output "1")))
+                 (yon-format-post-image (p)
+                                        ((:input (list post) :output "foo.png"))))
       (should (string= (yon-format-post-header post)
-                       "subject - author - the time - 1")))))
+                       "subject - author - the time - 1 - foo.png")))))
 
 (ert-deftest test-yon-format-post-comment ()
   "Test formatting post comment string."
