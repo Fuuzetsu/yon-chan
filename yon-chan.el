@@ -548,7 +548,7 @@ The header consists of the subject, author, timestamp, and post number."
                     (extension (yon-post-extension post))
                     (filename (yon-post-filename post))
                     (new-filename (number-to-string
-                                   (floor (yon-post-new-filename post)))))
+                                   (truncate (yon-post-new-filename post)))))
         (define-key kmap (kbd "<return>")
           (lambda ()
             (interactive)
