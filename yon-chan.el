@@ -30,6 +30,7 @@
 (require 'cl-lib)
 (require 'dash)
 (require 'yon-rendering)
+(require 'yon-formatting)
 
 ;;; Yon-chan mode
 (defgroup yon-chan nil
@@ -413,26 +414,6 @@ If newline is non-nil, newlines in the matching text will be removed."
 
 ;;; Rendering
 
-(defmacro $. (f g x)
-  `(,f (,g ,x)))
-
-(defun yon-apply-faces (text)
-  ($. yon-apply-quotelinks
-      yon-apply-deadlinks
-      ($. yon-apply-greentext
-          yon-apply-prettyprint text)))
-
-(defun yon-render (buffer proc obj)
-  (with-current-buffer buffer
-    (setq buffer-read-only nil)
-    (erase-buffer)
-    (funcall proc obj)
-    (setq buffer-read-only t)
-    (goto-char (point-min))))
-
-(defun yon-render-catalog (catalog)
-  (mapc 'yon-render-catalog-page catalog))
-
 (defun yon-render-catalog-page (page)
   (dolist (post page)
     (setf (yon-post-renderpos post) (point))
@@ -449,103 +430,6 @@ If newline is non-nil, newlines in the matching text will be removed."
        (concat (yon-apply-faces
                 (replace-regexp-in-string "^" "    "
                                           (yon-format-post post))) "\n")))))
-
-;;; Formatting
-
-(defun yon-format-post (post)
-  "Returns a formatted string representation of a post"
-  (format "%s\n%s\n"
-          (yon-format-post-header post)
-          (yon-format-post-comment post)))
-
-(defun yon-format-post-header (post)
-  "Returns a formatted string representation of a post header.
-The header consists of the subject, author, timestamp, and post number."
-  (lexical-let ((items (list (yon-format-post-subject post)
-                             (yon-format-post-author post)
-                             (yon-format-post-timestamp post)
-                             (yon-format-post-number post)
-                             (yon-format-post-image post))))
-    ;; Some header items could be blank (such as the image filename), so
-    ;; remove all nil values.
-    (json-join  (remq nil items) " - ")))
-
-(defun yon-format-post-comment (post)
-  "Returns a processed comment string."
-  (yon-process-post (yon-post-comment post)))
-
-(defun yon-format-post-subject (post)
-  "Returns a propertized, html-cleaned subject string."
-  (propertize
-    (yon-clean-html-string (yon-post-subject post))
-    'face 'yon-face-post-subject))
-
-(defun yon-format-post-author (post)
-  "Returns a propertized, html-cleaned author string."
-  (propertize
-    (yon-clean-html-string (yon-post-author post))
-    'face 'yon-face-post-author))
-
-(defun yon-format-post-timestamp (post)
-  "Returns an html-cleaned timestamp string."
-  (yon-clean-html-string (yon-post-timestamp post)))
-
-(defun yon-format-post-image (post)
-  (if (yon-post-extension post)
-      (lexical-let ((kmap (make-sparse-keymap))
-                    (board (with-current-buffer (buffer-name)
-                             (when (boundp 'yon-current-board)
-                               yon-current-board)))
-                    (extension (yon-post-extension post))
-                    (filename (yon-post-filename post))
-                    (new-filename (format "%d" (yon-post-new-filename post))))
-        (define-key kmap (kbd "<return>")
-          (lambda ()
-            (interactive)
-            (display-image-other-window
-             (concat "http://images.4chan.org/"
-                     board
-                     "/src/"
-                     new-filename
-                     extension)
-             (concat filename extension))))
-        (with-temp-buffer
-          (insert-text-button (concat filename extension)
-                              'keymap kmap)
-          (buffer-string)))
-    ""))
-
-(defun yon-format-post-number (post)
-  "Returns the post number. Clickable if it's a thread OP."
-  (lexical-let ((op (equal 0 (yon-post-replyto post)))
-                (kmap (make-sparse-keymap))
-                (board (with-current-buffer (buffer-name)
-                         (when (boundp 'yon-current-board)
-                             yon-current-board)))
-                (post-number (number-to-string (yon-post-number post))))
-    (define-key kmap (kbd "<return>")
-      (lambda ()
-        (interactive)
-        (yon-browse-thread
-         (switch-to-buffer-other-window
-          (generate-new-buffer
-           (concat "*yon-chan-/" board "/-" post-number)))
-         board post-number)))
-    (define-key kmap (kbd "a")
-      (lambda ()
-        (interactive)
-        (yon-browse-thread
-         (with-current-buffer
-             (rename-buffer (concat "*yon-chan-/" board "/-" post-number))
-           (current-buffer))
-         board post-number)))
-    (if (and op board)
-        (with-temp-buffer
-          (insert-text-button post-number
-                              'face 'yon-face-post-number-link
-                              'keymap kmap)
-          (buffer-string))
-      (propertize post-number 'face 'yon-face-post-number))))
 
 ;;;
 ;;; Actions

@@ -75,6 +75,25 @@
   "Basic face for dead cross-links."
   :group 'yon-chan)
 
+(defmacro $. (f g x)
+  `(,f (,g ,x)))
+
+(defun yon-apply-faces (text)
+  ($. yon-apply-quotelinks
+      yon-apply-deadlinks
+      ($. yon-apply-greentext
+          yon-apply-prettyprint text)))
+
+(defun yon-render (buffer proc obj)
+  (with-current-buffer buffer
+    (setq buffer-read-only nil)
+    (erase-buffer)
+    (funcall proc obj)
+    (setq buffer-read-only t)
+    (goto-char (point-min))))
+
+(defun yon-render-catalog (catalog)
+  (mapc 'yon-render-catalog-page catalog))
 
 
 (provide 'yon-rendering)
