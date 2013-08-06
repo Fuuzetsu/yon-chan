@@ -200,17 +200,28 @@ If newline is non-nil, newlines in the matching text will be removed."
          (ed "</a>"))
     (when start
       (lexical-let* ((end (+ (length ed) (string-match ed s start)))
-             (href (substring s start end))
-             (split (yon-extract-quote-link href))
-             (linkleft (car split))
-             (linksplit (split-string linkleft "#p"))
-             (res-start (string-match "/res/" linkleft))
-             (board-only (string-match "/.+?/" linkleft)))
+                     (href (substring s start end))
+                     (split (yon-extract-quote-link href))
+                     (linkleft (car split))
+                     (linksplit (split-string linkleft "#p"))
+                     (res-start (string-match "/res/" linkleft))
+                     (board-only (string-match "/.+?/" linkleft))
+                     (kmap (make-sparse-keymap))
+                     (text-str (with-temp-buffer
+                                 (insert-text-button
+                                  (cdr split)
+                                  'face 'yon-face-post-number-link
+                                  'keymap kmap)
+                                 (buffer-string)))
+                     (kbind (lambda (key body)
+                              (define-key kmap (kbd key)
+                                (lambda ()
+                                  (interactive)
+                                  (eval body))))))
         (if res-start
             (lexical-let* ((board (substring linkleft 1 res-start))
-                   (thread (substring linkleft (+ (length "/res/") res-start)))
-                   (post (cdr linksplit))
-                   (kmap (make-sparse-keymap)))
+                           (thread (substring linkleft (+ (length "/res/") res-start)))
+                           (post (cdr linksplit)))
               (define-key kmap (kbd "<return>")
                 (lambda ()
                   (interactive)
@@ -227,17 +238,9 @@ If newline is non-nil, newlines in the matching text will be removed."
                        (rename-buffer (concat "*yon-chan-/" board "/-" thread))
                      (current-buffer))
                    board thread)))
-              (yon-replace-string-section
-               s
-               (with-temp-buffer
-                 (insert-text-button (cdr split)
-                                     'face 'yon-face-post-number-link
-                                     'keymap kmap)
-                 (buffer-string))
-               start end))
+              (yon-replace-string-section s text-str start end))
           (if board-only ;; simple link such as >>>/a/
-              (lexical-let ((board (substring linkleft 1 (- (length linkleft) 1)))
-                            (kmap (make-sparse-keymap)))
+              (lexical-let ((board (substring linkleft 1 (- (length linkleft) 1))))
                 (define-key kmap (kbd "<return>")
                   (lambda ()
                     (interactive)
@@ -254,31 +257,18 @@ If newline is non-nil, newlines in the matching text will be removed."
                          (rename-buffer (concat "*yon-chan-/" board "/*"))
                        (current-buffer))
                      board)))
-                (yon-replace-string-section
-                 s
-                 (with-temp-buffer
-                   (insert-text-button (cdr split)
-                                       'face 'yon-face-post-number-link
-                                       'keymap kmap)
-                   (buffer-string))
-                 start end))
+                (yon-replace-string-section text-str s start end))
             (lexical-let ((thread (car linksplit))
-                          (post (cadr linksplit))
-                          (kmap (make-sparse-keymap))
+                          (post (string-to-number (cadr linksplit)))
                           (board (with-current-buffer (buffer-name)
                                    yon-current-board)))
+              ;; (funcall kbind "<return>" (lambda ()
+              ;;                             `(yon-jump-to-local-post ,post)))
               (define-key kmap (kbd "<return>")
                 (lambda ()
                   (interactive)
-                  (yon-jump-to-local-post (string-to-number post))))
-              (yon-replace-string-section
-               s
-               (with-temp-buffer
-                 (insert-text-button (cdr split)
-                                     'face 'yon-face-post-number-link
-                                     'keymap kmap)
-                 (buffer-string))
-               start end))))))))
+                  (yon-jump-to-local-post post)))
+              (yon-replace-string-section s text-str start end))))))))
 
 (defun yon-process-post (body)
   (yon-clean-html-string body))
