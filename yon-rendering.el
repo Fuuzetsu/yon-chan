@@ -257,7 +257,7 @@ If newline is non-nil, newlines in the matching text will be removed."
                          (rename-buffer (concat "*yon-chan-/" board "/*"))
                        (current-buffer))
                      board)))
-                (yon-replace-string-section text-str s start end))
+                (yon-replace-string-section s text-str start end))
             (lexical-let ((thread (car linksplit))
                           (post (string-to-number (cadr linksplit)))
                           (board (with-current-buffer (buffer-name)
