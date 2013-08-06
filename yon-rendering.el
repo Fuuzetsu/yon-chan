@@ -230,7 +230,7 @@ If newline is non-nil, newlines in the matching text will be removed."
               (yon-replace-string-section
                s
                (with-temp-buffer
-                 (insert-text-button (yon-strip-newlines (cdr split))
+                 (insert-text-button (cdr split)
                                      'face 'yon-face-post-number-link
                                      'keymap kmap)
                  (buffer-string))
@@ -257,7 +257,7 @@ If newline is non-nil, newlines in the matching text will be removed."
                 (yon-replace-string-section
                  s
                  (with-temp-buffer
-                   (insert-text-button (yon-strip-newlines (cdr split))
+                   (insert-text-button (cdr split)
                                        'face 'yon-face-post-number-link
                                        'keymap kmap)
                    (buffer-string))
@@ -274,7 +274,7 @@ If newline is non-nil, newlines in the matching text will be removed."
               (yon-replace-string-section
                s
                (with-temp-buffer
-                 (insert-text-button (yon-strip-newlines (cdr split))
+                 (insert-text-button (cdr split)
                                      'face 'yon-face-post-number-link
                                      'keymap kmap)
                  (buffer-string))
