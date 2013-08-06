@@ -157,7 +157,7 @@ Why haven't you joined the 144p master race yet /g/?
 (ert-deftest test-yon-extract-quote-link ()
   "Tests that given a string, we can splice out the relevant parts"
   (let ((orig "<a href=\"579850#p579850\" class=\"quotelink\">>>579850</a>")
-        (expected '("579850#p579850" ">>579850")))
+        (expected (cons "579850#p579850" ">>579850")))
     (should (equal (yon-extract-quote-link orig) expected))))
 
 
