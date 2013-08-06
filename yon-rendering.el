@@ -27,6 +27,7 @@
 ;;; Code:
 
 (require 'yon-structures)
+(require 'yon-utils)
 
 (defface yon-face-greentext
   '((default)
@@ -136,16 +137,8 @@
    text 'yon-face-prettyprint "<pre class=\"prettyprint\">" "</pre>" nil))
 
 (defun yon-apply-quotelinks (text)
-  (save-excursion
-    (lexical-let ((board (with-current-buffer (current-buffer)
-                           yon-current-board)))
-      (with-temp-buffer
-        (set (make-local-variable 'yon-current-board) board)
-        (insert text)
-        (goto-char (point-min))
-        (cl-loop until (eobp) do (yon-make-quote-buttons) (forward-line 1))
-        (buffer-string)))))
-
+  (let ((r (yon-make-quote-buttons text)))
+    (if r (yon-apply-quotelinks r) text)))
 
 (defun yon-render-catalog-page (page)
   (dolist (post page)
@@ -196,129 +189,99 @@ If newline is non-nil, newlines in the matching text will be removed."
 
 (defun yon-extract-quote-link (s)
   "Splices out contents of a href quotelink string into a pair"
-  (let ((rx "<a href=\"\\(.+\\)\" class=\"quotelink\">\\(.+\\)</a>"))
-    (split-string (replace-regexp-in-string rx "\\1 \\2" s))))
+  (let* ((rx "<a href=\"\\(.+?\\)\" class=\"quotelink\">\\(.+?\\)</a>")
+         (left (replace-regexp-in-string rx "\\1" s))
+         (right (replace-regexp-in-string rx "\\2" s)))
+    (cons left right)))
 
-(defun yon-make-quote-buttons ()
-  (let* ((start (string-match "<a href=\".*?\" class=\"quotelink\">"
-                              (yon-get-line-content)))
-         (op "<a href\"")
-         (ed  "</a>"))
+(defun yon-make-quote-buttons (s)
+  (let* ((lrx "<a href=\".+?\" class=\"quotelink\">.+</a>")
+         (start (string-match lrx s))
+         (ed "</a>"))
     (when start
-      (let* ((startn (+ start (line-beginning-position)))
-             (end (+ (yon-get-closing-point
-                      (yon-get-section startn (point-max)) ed)
-                     startn)))
-        (save-excursion
-          (goto-char startn)
-          (delete-char (+ 1 (length op)))
-          (goto-char (- end (+ 1 (length op))))
-          (delete-backward-char (length ed))
-          (goto-char startn)
-          (zap-to-char 1 (string-to-char "\""))
-          (delete-char (length " class=\"quotelink\">"))
-          (insert (current-kill 0))
-          (delete-backward-char 1)
-          (insert " ")
-          (goto-char startn)
-          (let* ((split-cont (split-string
-                              (yon-get-section
-                               startn
-                               (- end (+ (length op)
-                                         (length " class=\"quotelink\">")
-                                         (length ed)
-                                         1))) ;; space
-                              " "))
-                 (link (split-string (car split-cont) "#p"))
-                 (res-start (string-match "/res/" (car link))))
-            (progn
-              (delete-char (+ (length (car split-cont))
-                              (length (cadr split-cont))
-                              1))
-              (if res-start
-                  (progn
-                    (goto-char startn)
-                    (lexical-let* ((board
-                                    (with-temp-buffer
-                                      (insert (car link))
-                                      (goto-char (point-min))
-                                      (zap-to-char 2 (string-to-char "/"))
-                                      (erase-buffer)
-                                      (insert (current-kill 0))
-                                      (goto-char (point-min))
-                                      (delete-char 1)
-                                      (goto-char (point-max))
-                                      (delete-backward-char 1)
-                                      (buffer-string)))
-                                   (thread
-                                    (with-temp-buffer
-                                      (insert (car link))
-                                      (goto-char (point-min))
-                                      (delete-char (+ 2
-                                                      (length board)
-                                                      (length "res/")))
-                                      (buffer-string)))
-                                   (post (cadr link)))
-                      (let ((kmap (make-sparse-keymap)))
-                        (define-key kmap (kbd "<return>")
-                          (lambda ()
-                            (interactive)
-                            (yon-browse-thread
-                             (switch-to-buffer-other-window
-                              (generate-new-buffer
-                               (concat "*yon-chan-/" board "/-" thread)))
-                             board thread)))
-                        (define-key kmap (kbd "a")
-                          (lambda ()
-                            (interactive)
-                            (yon-browse-thread
-                             (with-current-buffer
-                                 (rename-buffer (concat "*yon-chan-/" board "/-" thread))
-                               (current-buffer))
-                             board thread)))
-                        (insert-text-button (yon-strip-newlines (cadr split-cont))
-                                            'face 'yon-face-post-number-link
-                                            'keymap kmap))))
-                (if (equal 1 (length link)) ;; simple link such as >>>/a/
-                    (lexical-let ((board (car link))
-                                  (kmap (make-sparse-keymap)))
-                      (define-key kmap (kbd "<return>")
-                        (lambda ()
-                          (interactive)
-                          (yon-browse-board-catalog
-                           (switch-to-buffer-other-window
-                            (generate-new-buffer
-                             (concat "*yon-chan-/" board "/*")))
-                           (substring board 1 (- (length board) 1)))))
-                      (define-key kmap (kbd "a")
-                        (lambda ()
-                          (interactive)
-                          (yon-browse-board-catalog
-                           (with-current-buffer
-                               (rename-buffer (concat "*yon-chan-/" board "/*"))
-                             (current-buffer))
-                           (substring board 1 (- (length board) 1)))))
-                      (insert-text-button (yon-strip-newlines (cadr split-cont))
-                                          'face 'yon-face-post-number-link
-                                          'keymap kmap)
-                      )
-                  (lexical-let ((thread (car link))
-                                (post (cadr link))
-                                (kmap (make-sparse-keymap))
-                                (board (with-current-buffer (buffer-name)
-                                         yon-current-board)))
-                    (define-key kmap (kbd "<return>")
-                      (lambda ()
-                        (interactive)
-                        (yon-jump-to-local-post (string-to-number post))))
-                    (insert-text-button (yon-strip-newlines (cadr split-cont))
-                                        'face 'yon-face-post-number-link
-                                        'keymap kmap)))))))))))
-
+      (lexical-let* ((end (+ (length ed) (string-match ed s start)))
+             (href (substring s start end))
+             (split (yon-extract-quote-link href))
+             (linkleft (car split))
+             (linksplit (split-string linkleft "#p"))
+             (res-start (string-match "/res/" linkleft))
+             (board-only (string-match "/.+?/" linkleft)))
+        (if res-start
+            (lexical-let* ((board (substring linkleft 1 res-start))
+                   (thread (substring linkleft (+ (length "/res/") res-start)))
+                   (post (cdr linksplit))
+                   (kmap (make-sparse-keymap)))
+              (define-key kmap (kbd "<return>")
+                (lambda ()
+                  (interactive)
+                  (yon-browse-thread
+                   (switch-to-buffer-other-window
+                    (generate-new-buffer
+                     (concat "*yon-chan-/" board "/-" thread)))
+                   board thread)))
+              (define-key kmap (kbd "a")
+                (lambda ()
+                  (interactive)
+                  (yon-browse-thread
+                   (with-current-buffer
+                       (rename-buffer (concat "*yon-chan-/" board "/-" thread))
+                     (current-buffer))
+                   board thread)))
+              (yon-replace-string-section
+               s
+               (with-temp-buffer
+                 (insert-text-button (yon-strip-newlines (cdr split))
+                                     'face 'yon-face-post-number-link
+                                     'keymap kmap)
+                 (buffer-string))
+               start end))
+          (if board-only ;; simple link such as >>>/a/
+              (lexical-let ((board (substring linkleft 1 (- (length linkleft) 1)))
+                            (kmap (make-sparse-keymap)))
+                (define-key kmap (kbd "<return>")
+                  (lambda ()
+                    (interactive)
+                    (yon-browse-board-catalog
+                     (switch-to-buffer-other-window
+                      (generate-new-buffer
+                       (concat "*yon-chan-/" board "/*")))
+                     board)))
+                (define-key kmap (kbd "a")
+                  (lambda ()
+                    (interactive)
+                    (yon-browse-board-catalog
+                     (with-current-buffer
+                         (rename-buffer (concat "*yon-chan-/" board "/*"))
+                       (current-buffer))
+                     board)))
+                (yon-replace-string-section
+                 s
+                 (with-temp-buffer
+                   (insert-text-button (yon-strip-newlines (cdr split))
+                                       'face 'yon-face-post-number-link
+                                       'keymap kmap)
+                   (buffer-string))
+                 start end))
+            (lexical-let ((thread (car linksplit))
+                          (post (cadr linksplit))
+                          (kmap (make-sparse-keymap))
+                          (board (with-current-buffer (buffer-name)
+                                   yon-current-board)))
+              (define-key kmap (kbd "<return>")
+                (lambda ()
+                  (interactive)
+                  (yon-jump-to-local-post (string-to-number post))))
+              (yon-replace-string-section
+               s
+               (with-temp-buffer
+                 (insert-text-button (yon-strip-newlines (cdr split))
+                                     'face 'yon-face-post-number-link
+                                     'keymap kmap)
+                 (buffer-string))
+               start end))))))))
 
 (defun yon-process-post (body)
-  (let* ((cleaned (yon-clean-html-string body)))
-    cleaned))
+  (yon-clean-html-string body))
 
 
 (provide 'yon-rendering)
