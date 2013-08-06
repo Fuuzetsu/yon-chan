@@ -30,6 +30,7 @@
     (url-retrieve
      (progn (message (concat "Retrieving " url)) url)
      (lambda (status)
+       (local-set-key (kbd "Q") 'kill-buffer-and-window)
        (rename-buffer name t)
        ;; Delete HTTP header
        (re-search-forward "\r?\n\r?\n")
