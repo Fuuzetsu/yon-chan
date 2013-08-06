@@ -132,10 +132,26 @@ Why haven't you joined the 144p master race yet /g/?
     (should (equalp (yon-build-post response) expected))))
 
 
-(ert-deftest test-yon-apply-quote-links-single ()
+(ert-deftest test-yon-apply-quote-links-single-post ()
   "Test that links to post and threads get formatted properly."
   (let ((orig "hello <a href=\"579850#p579850\" class=\"quotelink\">>>579850</a>")
         (expected "hello >>579850"))
+    (set (make-local-variable 'yon-current-board) "q")
+    (should (string= (yon-apply-quotelinks orig)
+                     expected))))
+
+(ert-deftest test-yon-apply-quote-links-single-outside-simple ()
+  "Test that links to post and threads get formatted properly."
+  (let ((orig "hello <a href=\"/a/\" class=\"quotelink\">>>>/a/</a>")
+        (expected "hello >>>/a/"))
+    (set (make-local-variable 'yon-current-board) "q")
+    (should (string= (yon-apply-quotelinks orig)
+                     expected))))
+
+(ert-deftest test-yon-apply-quote-links-single-outside-post ()
+  "Test that links to post and threads get formatted properly."
+  (let ((orig "hello <a href=\"/a/res/123#p456\" class=\"quotelink\">>>>/a/456</a>")
+        (expected "hello >>>/a/456"))
     (set (make-local-variable 'yon-current-board) "q")
     (should (string= (yon-apply-quotelinks orig)
                      expected))))
