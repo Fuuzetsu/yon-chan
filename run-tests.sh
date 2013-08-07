@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-ECUKES=$(find elpa/ecukes-*/bin/ecukes | tail -1)
+ECUKES=$(find .cask/*/elpa/ecukes-*/bin/ecukes | tail -1)
 
 cask exec "$ECUKES" "$@"
 RESULT=$?
