@@ -214,60 +214,48 @@ If newline is non-nil, newlines in the matching text will be removed."
                                   'keymap kmap)
                                  (buffer-string)))
                      (kbind (lambda (key body)
-                              (define-key kmap (kbd key)
-                                (lambda ()
-                                  (interactive)
-                                  (eval body))))))
+                              (lexical-let ((b body))
+                                (define-key kmap (kbd key)
+                                  (lambda ()
+                                    (interactive)
+                                    (apply b)))))))
         (if res-start
             (lexical-let* ((board (substring linkleft 1 res-start))
                            (thread (substring linkleft (+ (length "/res/") res-start)))
-                           (post (cdr linksplit)))
-              (define-key kmap (kbd "<return>")
-                (lambda ()
-                  (interactive)
-                  (yon-browse-thread
-                   (switch-to-buffer-other-window
-                    (generate-new-buffer
-                     (concat "*yon-chan-/" board "/-" thread)))
-                   board thread)))
-              (define-key kmap (kbd "a")
-                (lambda ()
-                  (interactive)
-                  (yon-browse-thread
-                   (with-current-buffer
-                       (rename-buffer (concat "*yon-chan-/" board "/-" thread))
-                     (current-buffer))
-                   board thread)))
+                           (post (cdr linksplit))
+                           (bname (concat "*yon-chan-/" board "/-" thread)))
+              (funcall kbind "<return>"
+                       '(yon-browse-thread
+                         (switch-to-buffer-other-window
+                          (generate-new-buffer bname))
+                         board thread))
+              (funcall kbind "a"
+                       '(yon-browse-thread
+                         (with-current-buffer (rename-buffer bname)
+                           (current-buffer))
+                         board thread))
               (yon-replace-string-section s text-str start end))
           (if board-only ;; simple link such as >>>/a/
-              (lexical-let ((board (substring linkleft 1 (- (length linkleft) 1))))
-                (define-key kmap (kbd "<return>")
-                  (lambda ()
-                    (interactive)
-                    (yon-browse-board-catalog
-                     (switch-to-buffer-other-window
-                      (generate-new-buffer
-                       (concat "*yon-chan-/" board "/*")))
-                     board)))
-                (define-key kmap (kbd "a")
-                  (lambda ()
-                    (interactive)
-                    (yon-browse-board-catalog
-                     (with-current-buffer
-                         (rename-buffer (concat "*yon-chan-/" board "/*"))
-                       (current-buffer))
-                     board)))
+              (lexical-let ((board (substring linkleft 1 (- (length linkleft) 1)))
+                            (bname (concat "*yon-chan-/" board "/*")))
+                (funcall kbind "<return>"
+                         '(yon-browse-board-catalog
+                           (switch-to-buffer-other-window
+                            (generate-new-buffer
+                             bname))
+                           board))
+                (funcall kbind "a"
+                         '(yon-browse-board-catalog
+                           (with-current-buffer
+                               (rename-buffer bname)
+                             (current-buffer))
+                           board))
                 (yon-replace-string-section s text-str start end))
             (lexical-let ((thread (car linksplit))
                           (post (string-to-number (cadr linksplit)))
                           (board (with-current-buffer (buffer-name)
                                    yon-current-board)))
-              ;; (funcall kbind "<return>" (lambda ()
-              ;;                             `(yon-jump-to-local-post ,post)))
-              (define-key kmap (kbd "<return>")
-                (lambda ()
-                  (interactive)
-                  (yon-jump-to-local-post post)))
+              (funcall kbind "<return>" `(yon-jump-to-local-post ,post))
               (yon-replace-string-section s text-str start end))))))))
 
 (defun yon-process-post (body)
