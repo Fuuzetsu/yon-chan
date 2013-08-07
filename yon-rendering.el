@@ -236,8 +236,8 @@ If newline is non-nil, newlines in the matching text will be removed."
                          board thread))
               (yon-replace-string-section s text-str start end))
           (if board-only ;; simple link such as >>>/a/
-              (lexical-let ((board (substring linkleft 1 (- (length linkleft) 1)))
-                            (bname (concat "*yon-chan-/" board "/*")))
+              (lexical-let* ((board (substring linkleft 1 (- (length linkleft) 1)))
+                             (bname (concat "*yon-chan-/" board "/*")))
                 (funcall kbind "<return>"
                          '(yon-browse-board-catalog
                            (switch-to-buffer-other-window
@@ -251,10 +251,10 @@ If newline is non-nil, newlines in the matching text will be removed."
                              (current-buffer))
                            board))
                 (yon-replace-string-section s text-str start end))
-            (lexical-let ((thread (car linksplit))
-                          (post (string-to-number (cadr linksplit)))
-                          (board (with-current-buffer (buffer-name)
-                                   yon-current-board)))
+            (lexical-let* ((thread (car linksplit))
+                           (post (string-to-number (cadr linksplit)))
+                           (board (with-current-buffer (buffer-name)
+                                    yon-current-board)))
               (funcall kbind "<return>" `(yon-jump-to-local-post ,post))
               (yon-replace-string-section s text-str start end))))))))
 
