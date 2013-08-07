@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 ECUKES=$(find elpa/ecukes-*/bin/ecukes | tail -1)
 
-carton exec "$ECUKES" "$@"
+cask exec "$ECUKES" "$@"
 RESULT=$?
 if [[ "$TRAVIS" == "true" ]]; then
     exit $RESULT
