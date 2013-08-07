@@ -11,18 +11,36 @@
 **** TODO Hook for user specified filtering functions
 **** TODO Some default filters
 **** TODO Display thumbnails
+**** TODO Post jumping
+***** DONE Jumping within the same thread
+      CLOSED: [2013-08-07 Wed 14:30]
+***** DONE Jumping between threads
+      CLOSED: [2013-08-07 Wed 14:30]
+***** DONE Jumping between boards
+      CLOSED: [2013-08-07 Wed 14:30]
+***** TODO Jumping to a catalog search
 *** TODO Images
+**** DONE Basic image opening
+     CLOSED: [2013-08-07 Wed 14:31]
 **** TODO Inline enlarge
 **** TODO Customisable size &c
 **** TODO Separate buffer image viewing
-***** TODO Two buffers alongside each other one with posts other with images
+**** TODO GIFs
+**** TODO Image hooks for users
+***** TODO Provide customvar for opening in separate program
+**** TODO Two buffers alongside each other one with posts other with images
       Think thumbnails + full buffer with image in image-dired-mode
 **** TODO Customisable size &c
 **** TODO Image saving
+
+*** TODO Post reporting
 ** TODO Posting
 *** TODO Text posting
 *** TODO Image posting
 *** TODO Pass support for captcha skipping
+** TODO Thread merging
+*** TODO Browsing
+*** TODO Posting
 ** TODO README
 *** TODO Key overview
 *** TODO Usage examples

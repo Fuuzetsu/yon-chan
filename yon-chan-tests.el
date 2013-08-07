@@ -132,25 +132,48 @@ Why haven't you joined the 144p master race yet /g/?
     (should (equalp (yon-build-post response) expected))))
 
 
-(ert-deftest test-yon-apply-quote-links ()
+(ert-deftest test-yon-apply-quote-links-single-post ()
   "Test that links to post and threads get formatted properly."
-  (let ((orig "<a href=\"579850#p579850\" class=\"quotelink\">>>579850</a>
-meanwhile, test
-<a href=\"/g/res/33526840#p33526840\" class=\"quotelink\">>>>/g/3352
-6840</a>
-<a href=\"/pol/\" class=\"quotelink\">>>>/pol/</a>")
-        (expected ">>579850
-meanwhile, test
->>>/g/33526840
->>>/pol/"))
+  (let ((orig "hello <a href=\"579850#p579850\" class=\"quotelink\">>>579850</a>")
+        (expected "hello >>579850"))
     (set (make-local-variable 'yon-current-board) "q")
     (should (string= (yon-apply-quotelinks orig)
                      expected))))
 
+(ert-deftest test-yon-apply-quote-links-single-outside-simple ()
+  "Test that links to post and threads get formatted properly."
+  (let ((orig "hello <a href=\"/a/\" class=\"quotelink\">>>>/a/</a>")
+        (expected "hello >>>/a/"))
+    (set (make-local-variable 'yon-current-board) "q")
+    (should (string= (yon-apply-quotelinks orig)
+                     expected))))
+
+(ert-deftest test-yon-apply-quote-links-single-outside-post ()
+  "Test that links to post and threads get formatted properly."
+  (let ((orig "hello <a href=\"/a/res/123#p456\" class=\"quotelink\">>>>/a/456</a>")
+        (expected "hello >>>/a/456"))
+    (set (make-local-variable 'yon-current-board) "q")
+    (should (string= (yon-apply-quotelinks orig)
+                     expected))))
+
+(ert-deftest test-yon-apply-quote-links-multi ()
+  "Test that links to post and threads get formatted properly."
+  (let ((orig (concat "hello "
+                      "<a href=\"579850#p579850\" "
+                      "class=\"quotelink\">>>579850</a> "
+                      "<a href=\"/g/res/33526840#p33526840\" "
+                      "class=\"quotelink\">>>>/g/33526840</a> "
+                      "world"))
+        (expected "hello >>579850 >>>/g/33526840 world"))
+    (set (make-local-variable 'yon-current-board) "q")
+    (should (string= (yon-apply-quotelinks orig)
+                     expected))))
+
+
 (ert-deftest test-yon-extract-quote-link ()
   "Tests that given a string, we can splice out the relevant parts"
   (let ((orig "<a href=\"579850#p579850\" class=\"quotelink\">>>579850</a>")
-        (expected '("579850#p579850" ">>579850")))
+        (expected (cons "579850#p579850" ">>579850")))
     (should (equal (yon-extract-quote-link orig) expected))))
 
 

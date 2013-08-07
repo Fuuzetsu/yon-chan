@@ -55,6 +55,13 @@
   (save-excursion
     (buffer-substring start end)))
 
+(defun yon-replace-string-section (original replace start end)
+  "Replaces a section from START to END with REPLACE in ORIGINAL"
+  (let ((left (substring original 0 start))
+        (right (substring original end)))
+    (concat left replace right)))
+
+
 (defun yon-elem (alst key &optional default)
   "Fetch value from alist with a default value if key is not present."
   (lexical-let ((elem (cdr (assoc key alst))))
