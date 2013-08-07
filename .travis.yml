@@ -20,6 +20,7 @@ before_install:
           emacs24 emacs24-el emacs24-common-non-dfsg;
     fi
   - curl -fsSkL https://raw.github.com/rejeep/cask.el/master/go | sh
+  - export PATH="~/.cask/bin:$PATH"
   - cask
 env:
   - EMACS=emacs24 TAGS="--tags ~@requires-e24-3"
