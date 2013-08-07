@@ -32,10 +32,15 @@
       Think thumbnails + full buffer with image in image-dired-mode
 **** TODO Customisable size &c
 **** TODO Image saving
+
+*** TODO Post reporting
 ** TODO Posting
 *** TODO Text posting
 *** TODO Image posting
 *** TODO Pass support for captcha skipping
+** TODO Thread merging
+*** TODO Browsing
+*** TODO Posting
 ** TODO README
 *** TODO Key overview
 *** TODO Usage examples
