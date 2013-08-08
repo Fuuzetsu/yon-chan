@@ -29,7 +29,7 @@ implement.
 
 We use Ecukes (with espuds) and ert for testing. First install `Cask`
 and make sure it's somewhere in your path and then run `cask` (might
-need `cask --dev` in the main directory to pull in various
+need `cask --dev`) in the main directory to pull in various
 dependencies. See `.travis.yml` file for how we automated this
 process. Currently the client itself depends on the `dash` library so
 make sure you have it in your load-path.
