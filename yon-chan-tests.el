@@ -293,4 +293,26 @@ end test"))
       (set (make-local-variable 'yon-current-board) "q"))
     (should (string= (yon-format-post-number post) "1"))))
 
+(ert-deftest test-yon-current-buffer-board ()
+  "Test getting the current board from the current buffer."
+  (should (string= (yon-current-buffer-board) nil))
+  (with-current-buffer (current-buffer)
+    (set (make-local-variable 'yon-current-board) "g"))
+  (should (string= (yon-current-buffer-board) "g")))
+
+(ert-deftest test-yon-browse-thread-other-window ()
+  (mocker-let ((yon-current-buffer-board
+                ()
+                ((:output "g")))
+               (yon-browse-thread
+                (buffer board number)
+                ((:input '("buffer" "g" "9001"))))
+               (switch-to-buffer-other-window
+                (buffer)
+                ((:input '("buffer") :output "buffer")))
+               (generate-new-buffer
+                (name)
+                ((:input '("*yon-chan-/g/-9001") :output "buffer"))))
+    (yon-browse-thread-other-window (make-yon-post :number 9001))))
+
 (provide 'yon-chan-tests)

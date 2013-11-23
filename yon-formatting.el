@@ -92,28 +92,19 @@ The header consists of the subject, author, timestamp, and post number."
 
 (defun yon-format-post-number (post)
   "Returns the post number. Clickable if it's a thread OP."
-  (lexical-let ((op (equal 0 (yon-post-replyto post)))
-                (kmap (make-sparse-keymap))
-                (board (with-current-buffer (buffer-name)
-                         (when (boundp 'yon-current-board)
-                             yon-current-board)))
-                (post-number (number-to-string (yon-post-number post))))
-    (define-key kmap (kbd "<return>")
-      (lambda ()
-        (interactive)
-        (yon-browse-thread
-         (switch-to-buffer-other-window
-          (generate-new-buffer
-           (concat "*yon-chan-/" board "/-" post-number)))
-         board post-number)))
-    (define-key kmap (kbd "a")
-      (lambda ()
-        (interactive)
-        (yon-browse-thread
-         (with-current-buffer
-             (rename-buffer (concat "*yon-chan-/" board "/-" post-number))
-           (current-buffer))
-         board post-number)))
+  (lexical-let* ((op (equal 0 (yon-post-replyto post)))
+                 (kmap (make-sparse-keymap))
+                 (board (with-current-buffer (buffer-name)
+                          (when (boundp 'yon-current-board)
+                            yon-current-board)))
+                 (post-number (number-to-string (yon-post-number post)))
+                 ;; Need to rebind in lexical scope
+                 (post post)
+                 (browse (lambda ()
+                           (interactive)
+                           (yon-browse-thread-other-window post))))
+    (define-key kmap (kbd "<return>") browse)
+    (define-key kmap (kbd "a") browse)
     (if (and op board)
         (with-temp-buffer
           (insert-text-button post-number

@@ -25,6 +25,24 @@
 
 ;;; Code:
 
+(defun yon-current-buffer-board ()
+  "Returns the board name for the current buffer."
+  (with-current-buffer (buffer-name)
+    (when (boundp 'yon-current-board)
+      yon-current-board)))
+
+(defun yon-browse-thread-other-window (post)
+  "Opens thread from the current board in a new window."
+  (lexical-let* ((board (yon-current-buffer-board))
+                 (post-number (number-to-string (yon-post-number post)))
+                 (buffer (switch-to-buffer-other-window
+                          (generate-new-buffer
+                           (concat "*yon-chan-/"
+                                   board
+                                   "/-"
+                                   post-number)))))
+    (yon-browse-thread buffer board post-number)))
+
 (defun yon-jump-posts (amount)
   "Jumps `amount' of posts. Can be negative."
   (let* ((posts (with-current-buffer (current-buffer)
