@@ -1,4 +1,7 @@
-ECUKES = $(shell find elpa/ecukes-*/ecukes | tail -1)
+all: cukes unit-tests
 
-all:
-	carton exec ${ECUKES} features
+cukes:
+	./run-tests.sh
+
+unit-tests:
+	./run-unit-tests.sh
