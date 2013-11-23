@@ -17,7 +17,7 @@ with the client.
 
 Currently most key bindings can be found in `yon-chan.el` and they
 should be consistent with what you're used to (`n` and `p` go up and
-down, `g` refreshes buffers, `q` buries &c.)
+down, `g` refreshes buffers, `q` buries, etc.)
 
 
 Contributing
@@ -34,16 +34,14 @@ dependencies. See `.travis.yml` file for how we automated this
 process. Currently the client itself depends on the `dash` library so
 make sure you have it in your load-path.
 
-`./run-tests.sh` runs feature tests (i.e. the tests that ensure we get
-the behaviour we want) and `./run-unit-tests.sh` runs unit tests
+`make cukes` runs feature tests (i.e. the tests that ensure we get
+the behaviour we want) and `make unit-tests` runs unit tests
 (tests that ensure smaller functions do what we want to their inputs).
-You can run both with `./run-travis-ci.sh`.
+You can simply run `make` to run both unit tests and feature tests.
 
 You can also install the Ruby `watchr` gem and run `watchr
 watch-tests.watchr` to have all these ran every time you make a change
 to the files.
-
-
 
 License
 -------
