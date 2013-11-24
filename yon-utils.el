@@ -26,9 +26,13 @@
 ;;; Code:
 
 (defun yon-strip-newlines (body)
+  "Return a copy of the string BODY with all newline characters
+removed."
   (replace-regexp-in-string "\n" "" body))
 
 (defun yon-clean-html-string (body)
+  "Return a copy of the string BODY with certain HTML encoded
+characters and tags removed."
   (let* ((replace-list (list '("&#039;" . "'")
                              '("&gt;" . ">")
                              '("&lt;" . "<")
@@ -41,29 +45,33 @@
                       (car y) (cdr y) x))))
     (reduce replacer (cons body replace-list))))
 
-
 (defun yon-get-line-content ()
+  "Return the contents of the current line."
   (save-excursion
-    (let ((pos-end (line-beginning-position 2)))
-      (buffer-substring (line-beginning-position) pos-end))))
+    (buffer-substring (line-beginning-position)
+                      (line-beginning-position 2))))
 
 (defun yon-get-closing-point (bufstr close)
-  (let ((match (string-match close bufstr)))
-    (+ match (length close))))
+  "Return the point after which the string CLOSE appears in the
+string BUFSTR."
+  (+ (string-match close bufstr)
+     (length close)))
 
 (defun yon-get-section (start end)
+  "Return the string that is between START and END points."
   (save-excursion
     (buffer-substring start end)))
 
 (defun yon-replace-string-section (original replace start end)
-  "Replaces a section from START to END with REPLACE in ORIGINAL"
-  (let ((left (substring original 0 start))
-        (right (substring original end)))
-    (concat left replace right)))
-
+  "Return a new string that is a copy of ORIGINAL with the
+section from START to END replaced with the string REPLACE."
+  (concat (substring original 0 start)
+          replace
+          (substring original end)))
 
 (defun yon-elem (alst key &optional default)
-  "Fetch value from alist with a default value if key is not present."
+  "Return value from the alist ALST with a default value of
+DEFAULT if KEY is not present. The default return value is nil."
   (lexical-let ((elem (cdr (assoc key alst))))
     (if elem
         elem
