@@ -154,8 +154,7 @@
       (setf (yon-post-renderpos post) (point))
       (insert
        (concat (yon-apply-faces
-                (replace-regexp-in-string "^" "    "
-                                          (yon-format-post post))) "\n")))))
+                (yon-format-post post)) "\n")))))
 
 (defun yon-possibly-colorify-line-by-tags
   (opregex endregex colourface &optional newline)
