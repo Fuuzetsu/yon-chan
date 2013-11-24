@@ -63,7 +63,7 @@
   renderpos)
 
 (defun yon-build-post (response)
-  "Builds a post object from deserialized JSON response."
+  "Create a new post object from deserialized JSON RESPONSE."
   (make-yon-post
    :subject          (yon-elem response 'sub "No subject")
    :author           (yon-elem response 'name "Anonymous")
@@ -100,21 +100,25 @@
    :imagelimit       (yon-elem response 'imagelimit)
    :renderpos        '()))
 
-
 (defun yon-build-thread (response buffer)
+  "Build post objects from the thread RESPONSE JSON and associate
+them with BUFFER."
   (with-current-buffer buffer
     (set (make-local-variable 'yon-buffer-posts)
          (mapcar 'yon-build-post (yon-elem response 'posts)))))
 
 (defun yon-build-catalog (response buffer)
+  "Build post objects from the catalog RESPONSE JSON and
+associate them with BUFFER."
   (with-current-buffer buffer
     (let ((pages (mapcar 'yon-build-page response)))
       (set (make-local-variable 'yon-buffer-posts) (-flatten pages))
       pages)))
 
 (defun yon-build-page (response)
+  "Return a list of posts for the page of threads in RESPONSE
+JSON."
   (mapcar 'yon-build-post (yon-elem response 'threads)))
-
 
 (provide 'yon-structures)
 ;;; yon-structures.el ends here

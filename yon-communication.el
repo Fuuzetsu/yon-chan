@@ -28,6 +28,8 @@
 (require 'yon-utils)
 
 (defun yon-get-json-from-current-buffer ()
+  "Kill the current buffer and return the (presumably) JSON
+encoded string that was in it."
   (let ((json nil))
     (save-excursion
       (goto-char (point-min))
@@ -37,11 +39,13 @@
     json))
 
 (defun yon-parse-json (json)
+  "Return parse tree for the JSON string."
   (json-read-from-string json))
 
 (defun yon-get-and-parse-json ()
+  "Return the parse tree for the JSON string in the current
+buffer. The current buffer is killed as a side-effect."
   (yon-parse-json (yon-get-json-from-current-buffer)))
-
 
 (provide 'yon-communication)
 ;;; yon-communication.el ends here

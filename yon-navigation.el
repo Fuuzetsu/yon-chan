@@ -31,6 +31,11 @@
     (when (boundp 'yon-current-board)
       yon-current-board)))
 
+(defun yon-current-buffer-posts ()
+  "Return the posts for the current buffer."
+  (with-current-buffer (current-buffer)
+    yon-buffer-posts))
+
 (defun yon-browse-thread-other-window (post)
   "Opens thread from the current board in a new window."
   (lexical-let* ((board (yon-current-buffer-board))
@@ -43,10 +48,23 @@
                                    post-number)))))
     (yon-browse-thread buffer board post-number)))
 
+(defun yon-display-image-other-window (url name)
+  "Fetch image from URL and display it in a buffer called NAME."
+  (lexical-let ((name name))
+    (url-retrieve
+     (progn (message (concat "Retrieving " url)) url)
+     (lambda (status)
+       (local-set-key (kbd "Q") 'kill-buffer-and-window)
+       (rename-buffer name t)
+       ;; Delete HTTP header
+       (re-search-forward "\r?\n\r?\n")
+       (delete-region (point-min) (point))
+       (image-mode)
+       (switch-to-buffer-other-window (buffer-name))))))
+
 (defun yon-jump-posts (amount)
-  "Jumps `amount' of posts. Can be negative."
-  (let* ((posts (with-current-buffer (current-buffer)
-                  yon-buffer-posts))
+  "Jump AMOUNT of posts. Can be negative."
+  (let* ((posts (yon-current-buffer-posts))
          ;; zip index with distance
          (ixed
           (-zip-with
@@ -75,8 +93,9 @@
       nil)))
 
 (defun yon-jump-to-local-post (number)
+  "Jump to post NUMBER in the current buffer."
   (let ((render-place))
-    (dolist (post (with-current-buffer (current-buffer) yon-buffer-posts))
+    (dolist (post (yon-current-buffer-posts))
       (when (equal number (yon-post-number post))
         (setq render-place (yon-post-renderpos post))))
     (if render-place
@@ -86,7 +105,9 @@
       (message "Could not find post %s to jump to." (number-to-string number)))))
 
 (defun yon-jump-to-nth (n)
-  "Jumps to nth post. Negative n gives first post too high n gives last post."
+  "Jump to Nth post. Jump to the first post when N is
+negative. Jump to the last post when N is greater than the number
+of posts in the current buffer."
   (let ((sorted-posts (sort yon-buffer-posts
                             (lambda (x y)
                               ;; This currently is just a safety measure,
@@ -102,27 +123,27 @@
      (t (yon-jump-to-local-post (yon-post-number (nth n sorted-posts)))))))
 
 (defun yon-jump-post-forward (&optional number)
-  "Jump backward one post. Jump forward `n' posts if given an argument."
+  "Jump forward N posts. N defaults to 1."
   (interactive "p")
   (yon-jump-posts number))
 
 (defun yon-jump-post-backward (&optional number)
-  "Jump backward one post. Jump backward `n' posts if given an argument."
+  "Jump backward N posts. N defaults to 1."
   (interactive "p")
   (yon-jump-posts (* -1 number)))
 
 (defun yon-jump-post-first ()
-  "Jump to first post on the page."
+  "Jump to the first post in the buffer."
   (interactive)
   (yon-jump-to-nth 0))
 
 (defun yon-jump-post-last ()
-  "Jump to last post on the page."
+  "Jump to the last post in the buffer."
   (interactive)
   (yon-jump-to-nth (- (length yon-buffer-posts) 1)))
 
-
 (defun yon-browse-board-catalog (buffer board)
+  "View the catalog for BOARD in the buffer BUFFER."
   (url-retrieve (concat "http://api.4chan.org/" board "/catalog.json")
                 (lexical-let ((yon-buffer buffer)
                               (board-l board))
@@ -140,12 +161,14 @@
                                                      yon-buffer)))))))
 
 (defun yon-refresh-buffer (&optional buffer)
-  "Refreshes arbitrary buffer"
+  "Refresh the posts in BUFFER. BUFFER defaults to the current
+buffer."
   (interactive)
   (with-current-buffer (if buffer buffer (current-buffer))
     (funcall yon-refresh)))
 
 (defun yon-browse-thread (buffer board thread-number)
+  "View thread THREAD-NUMBER for BOARD in BUFFER."
   (url-retrieve
    (concat "http://api.4chan.org/" board "/res/" thread-number ".json")
    (lexical-let ((yon-buffer buffer)
@@ -164,7 +187,7 @@
                      (yon-build-thread (yon-get-and-parse-json) yon-buffer)))))))
 
 (defun yon-chan-browse-board (board)
-  "Shows the specified board's catalog."
+  "View the catalog for BOARD in a new window."
   (interactive (list (completing-read "Enter the board you wish to visit: " yon-chan-boards)))
   (let ((clean-board (if (string-match "/.+?/" board)
                          (substring board 1 -1)
