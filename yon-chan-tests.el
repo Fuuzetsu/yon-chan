@@ -292,6 +292,22 @@ end test"))
       (should (string= (yon-format-post-number post) "1")))))
 
 
+(ert-deftest test-yon-format-post-entity ()
+  (let ((alink '(a ((href . "\\\"33503726#p33503726\\\"")
+                    (class . "\\\"quotelink\\\"")) ">>33503726"))
+        (brlink '(br nil))
+        (spanlink '(span ((class . "\\\"quote\\\""))
+                         ">shana~~"))
+        (nolink "shana")
+        (codelink '(pre ((class . "\\\"prettyprint\\\"")) "somecode" (br nil)
+                        "morecode" (br nil))))
+    (should (string= (yon-format-post-entity alink) ">>33503726"))
+    (should (string= (yon-format-post-entity brlink) "\n"))
+    (should (string= (yon-format-post-entity spanlink) ">shana~~"))
+    (should (string= (yon-format-post-entity nolink) "shana"))
+    (should (string= (yon-format-post-entity codelink)
+                     "somecode\nmorecode\n"))))
+
 ;; I can't think of a way to properly unit test this…
 (ert-deftest test-yon-format-post-number-op ()
   "Test formatting post number string"

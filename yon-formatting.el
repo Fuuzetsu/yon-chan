@@ -27,6 +27,8 @@
 
 ;;; Formatting
 
+(require 'dash)
+
 (defun yon-format-post (post)
   "Returns a formatted string representation of a post"
   (format "%s\n%s\n"
@@ -47,7 +49,25 @@ The header consists of the subject, author, timestamp, and post number."
 
 (defun yon-format-post-comment (post)
   "Returns a processed comment string."
-  (yon-process-post (yon-post-comment post)))
+  (let ((html-tree (with-temp-buffer
+                     (insert (yon-post-comment post))
+                     (-drop 2 (car (-drop 2 (libxml-parse-html-region
+                                             (point-min) (point-max))))))))
+    (--map (yon-format-post-entity it) html-tree)
+    (yon-process-post (yon-post-comment post))))
+
+(defun yon-format-post-entity (x)
+  (cond ((eq 'string (type-of x)) x)
+        ((and (> (length x) 0)
+              (eq (car x) 'a)) (nth 2 x))
+        ((and (> (length x) 0)
+              (eq (car x) 'span)) (nth 2 x))
+        ((and (> (length x) 0)
+              (eq (car x) 'br)) "\n")
+        ((and (> (length x) 0)
+              (eq (car x) 'pre)) (apply 'concat  (-map 'yon-format-post-entity
+                                                       (-drop 2 x))))
+        (t x)))
 
 (defun yon-format-post-subject (post)
   "Returns a propertized, html-cleaned subject string."
