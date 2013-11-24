@@ -224,12 +224,11 @@ end test"))
 
 (ert-deftest test-yon-format-post ()
   "Test formatting post string."
-  (let ((post "a fake post"))
+  (let ((post (make-yon-post
+               :comment "bar\nbaz\nqux")))
     (mocker-let ((yon-format-post-header (p)
-                                         ((:input (list post) :output "foo")))
-                 (yon-format-post-comment (p)
-                                          ((:input (list post) :output "bar"))))
-      (should (string= (yon-format-post post) "foo\nbar\n")))))
+                                         ((:input (list post) :output "foo"))))
+                (should (string= (yon-format-post post) "foo\nbar\nbaz\nqux\n")))))
 
 (ert-deftest test-yon-format-post-header ()
   "Actually test formatting post header strings."
@@ -261,9 +260,7 @@ end test"))
 (ert-deftest test-yon-format-post-comment ()
   "Test formatting post comment string."
   (let ((post (make-yon-post :comment "hello world")))
-    (mocker-let ((yon-process-post (comment)
-                                   ((:input '("hello world") :output "hello world"))))
-      (should (string= (yon-format-post-comment post) "hello world")))))
+    (should (string= (yon-format-post-comment post) "hello world"))))
 
 (ert-deftest test-yon-format-post-subject ()
   "Test formatting post subject string"
