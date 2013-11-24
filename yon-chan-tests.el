@@ -300,6 +300,12 @@ end test"))
     (set (make-local-variable 'yon-current-board) "g"))
   (should (string= (yon-current-buffer-board) "g")))
 
+(ert-deftest test-yon-current-buffer-posts ()
+  "Test getting the current posts from the current buffer."
+  (with-current-buffer (current-buffer)
+    (set (make-local-variable 'yon-buffer-posts) '("posts")))
+  (should (equal (yon-current-buffer-posts) '("posts"))))
+
 (ert-deftest test-yon-browse-thread-other-window ()
   (mocker-let ((yon-current-buffer-board
                 ()

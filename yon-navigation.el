@@ -31,6 +31,11 @@
     (when (boundp 'yon-current-board)
       yon-current-board)))
 
+(defun yon-current-buffer-posts ()
+  "Return the posts for the current buffer."
+  (with-current-buffer (current-buffer)
+    yon-buffer-posts))
+
 (defun yon-browse-thread-other-window (post)
   "Opens thread from the current board in a new window."
   (lexical-let* ((board (yon-current-buffer-board))
@@ -59,8 +64,7 @@
 
 (defun yon-jump-posts (amount)
   "Jump AMOUNT of posts. Can be negative."
-  (let* ((posts (with-current-buffer (current-buffer)
-                  yon-buffer-posts))
+  (let* ((posts (yon-current-buffer-posts))
          ;; zip index with distance
          (ixed
           (-zip-with
@@ -91,7 +95,7 @@
 (defun yon-jump-to-local-post (number)
   "Jump to post NUMBER in the current buffer."
   (let ((render-place))
-    (dolist (post (with-current-buffer (current-buffer) yon-buffer-posts))
+    (dolist (post (yon-current-buffer-posts))
       (when (equal number (yon-post-number post))
         (setq render-place (yon-post-renderpos post))))
     (if render-place
