@@ -34,7 +34,6 @@
 (require 'yon-navigation)
 (require 'yon-structures)
 (require 'yon-utils)
-(require 'yon-actions)
 (require 'yon-communication)
 
 ;;; Yon-chan mode

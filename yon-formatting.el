@@ -75,7 +75,7 @@ The header consists of the subject, author, timestamp, and post number."
         (define-key kmap (kbd "<return>")
           (lambda ()
             (interactive)
-            (display-image-other-window
+            (yon-display-image-other-window
              (concat "http://images.4chan.org/"
                      board
                      "/src/"

@@ -43,8 +43,22 @@
                                    post-number)))))
     (yon-browse-thread buffer board post-number)))
 
+(defun yon-display-image-other-window (url name)
+  "Fetch image from URL and display it in a buffer called NAME."
+  (lexical-let ((name name))
+    (url-retrieve
+     (progn (message (concat "Retrieving " url)) url)
+     (lambda (status)
+       (local-set-key (kbd "Q") 'kill-buffer-and-window)
+       (rename-buffer name t)
+       ;; Delete HTTP header
+       (re-search-forward "\r?\n\r?\n")
+       (delete-region (point-min) (point))
+       (image-mode)
+       (switch-to-buffer-other-window (buffer-name))))))
+
 (defun yon-jump-posts (amount)
-  "Jumps `amount' of posts. Can be negative."
+  "Jump AMOUNT of posts. Can be negative."
   (let* ((posts (with-current-buffer (current-buffer)
                   yon-buffer-posts))
          ;; zip index with distance
