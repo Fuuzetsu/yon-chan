@@ -232,20 +232,31 @@ end test"))
       (should (string= (yon-format-post post) "foo\nbar\n")))))
 
 (ert-deftest test-yon-format-post-header ()
-  "Test formatting post header string."
-  (let ((post "a fake post"))
-    (mocker-let ((yon-format-post-subject (p)
-                                          ((:input (list post) :output "subject")))
-                 (yon-format-post-author (p)
-                                         ((:input (list post) :output "author")))
-                 (yon-format-post-timestamp (p)
-                                            ((:input (list post) :output "the time")))
-                 (yon-format-post-number (p)
-                                         ((:input (list post) :output "1")))
-                 (yon-format-post-image (p)
-                                        ((:input (list post) :output "foo.png"))))
-      (should (string= (yon-format-post-header post)
-                       "subject - author - the time - 1 - foo.png")))))
+  "Actually test formatting post header strings."
+  (let ((post (make-yon-post
+               :subject "Subject"
+               :author "Author"
+               :timestamp "Tomorrow"
+               :number 1234
+               :filename "battlelolis"
+               :extension ".png"
+               :new-filename 12345)))
+    (with-current-buffer (current-buffer)
+      (set (make-local-variable 'yon-current-board) "g"))
+    (should (string= (yon-format-post-header post)
+                     "Subject - Author - Tomorrow - 1234 - battlelolis.png"))))
+
+(ert-deftest test-yon-format-post-header-no-image ()
+  "Test formatting post header string without any image."
+  (let ((post (make-yon-post
+               :subject "Subject"
+               :author "Author"
+               :timestamp "Tomorrow"
+               :number 1234)))
+    (with-current-buffer (current-buffer)
+      (set (make-local-variable 'yon-current-board) "g"))
+    (should (string= (yon-format-post-header post)
+                     "Subject - Author - Tomorrow - 1234"))))
 
 (ert-deftest test-yon-format-post-comment ()
   "Test formatting post comment string."
