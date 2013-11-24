@@ -86,7 +86,7 @@ The header consists of the subject, author, timestamp, and post number."
           (insert-text-button (concat filename extension)
                               'keymap kmap)
           (buffer-string)))
-    ""))
+    nil))
 
 (defun yon-format-post-number (post)
   "Returns the post number. Clickable if it's a thread OP."
