@@ -68,9 +68,7 @@ The header consists of the subject, author, timestamp, and post number."
 (defun yon-format-post-image (post)
   (if (yon-post-extension post)
       (lexical-let ((kmap (make-sparse-keymap))
-                    (board (with-current-buffer (buffer-name)
-                             (when (boundp 'yon-current-board)
-                               yon-current-board)))
+                    (board (yon-current-buffer-board))
                     (extension (yon-post-extension post))
                     (filename (yon-post-filename post))
                     (new-filename (format "%d" (yon-post-new-filename post))))
@@ -94,9 +92,7 @@ The header consists of the subject, author, timestamp, and post number."
   "Returns the post number. Clickable if it's a thread OP."
   (lexical-let* ((op (equal 0 (yon-post-replyto post)))
                  (kmap (make-sparse-keymap))
-                 (board (with-current-buffer (buffer-name)
-                          (when (boundp 'yon-current-board)
-                            yon-current-board)))
+                 (board (yon-current-buffer-board))
                  (post-number (number-to-string (yon-post-number post)))
                  ;; Need to rebind in lexical scope
                  (post post)
