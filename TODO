@@ -2,6 +2,11 @@
 
 * Things To Do
 
+** TODO 0.1 Release
+*** TODO Fix colors for low-color terminals
+*** TODO Pressing <return> on thread subject should open thread
+*** TODO Apply auto-fill to posts
+
 ** TODO Browsing
 *** TODO Navigation
 **** TODO Post hiding
