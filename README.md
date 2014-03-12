@@ -43,6 +43,11 @@ You can also install the Ruby `watchr` gem and run `watchr
 watch-tests.watchr` to have all these ran every time you make a change
 to the files.
 
+Screenshots
+-----------
+
+![emacs general](http://fuuzetsu.co.uk/images/yon-chan-screenshot.png)
+
 License
 -------
 
